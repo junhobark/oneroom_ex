@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "213182533624",
+    "project_id": "oneroomex",
+    "storage_bucket": "oneroomex.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213182533624:android:04b60aa5e0f9a2597f900d",
+        "android_client_info": {
+          "package_name": "com.example.oneroom_ex"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "213182533624-gmc6hnvlpeiqjuo8rphulrhs358dev1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJQv29TxvnG5kCCxgH4NTCw3eL5GpQbfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "213182533624-gmc6hnvlpeiqjuo8rphulrhs358dev1d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "213182533624-sisu7grgnikefbgbg5dsdi923g2gtnc9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.oneroomEx"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
