@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
+import 'package:oneroom_ex/map/map_markers.dart';
 import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
+import 'package:http/http.dart' as http;
 
 const String kakaoMapKey = '06fa866ad2a59ae0dfba2b8c9d47a578';
 
@@ -18,9 +21,23 @@ class mapScreen extends StatefulWidget {
 }
 
 class _mapScreenState extends State<mapScreen> {
+  String jsonData = '';
+  Future<List<Mapmarkers>> fetchData() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/map/test'));
+    if (response.statusCode == 200) {
+      print('응답했다');
+      print(utf8.decode(response.bodyBytes));
+      final data = jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+      return data.map((item) => Mapmarkers.fromJson(item)).toList();
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
+  List<Mapmarkers> mapmarkers = [];
   late KakaoMapController mapController;
-  Set<Marker> markers = {};
-  late var model;
+  List<Marker> markers = [];
+  var model = null;
   var selectedPlace = null;
   final TextEditingController _AddressController = TextEditingController();
   String roadaddress = '';
@@ -31,9 +48,15 @@ class _mapScreenState extends State<mapScreen> {
   bool draggable = true;
   bool zoomable = true;
   String mark_id = '';
+
   @override
   void initState() {
     super.initState();
+    fetchData().then((data) {
+      setState(() {
+        mapmarkers = data;
+      });
+    });
   }
 
   @override
@@ -47,13 +70,21 @@ class _mapScreenState extends State<mapScreen> {
           KakaoMap(
               onMapCreated: ((KakaoMapController controller) async {
                 mapController = controller;
+                mapmarkers.map((data) {
+                  markers.add(Marker(
+                      markerId: data.id.toString(),
+                      latLng: LatLng(data.posx, data.posy),
+                      markerImageSrc:
+                          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
+                }).toList();
               }),
               markers: markers.toList(),
               currentLevel: 1,
               onMarkerTap: (markerId, latLng, zoomLevel) {
-                map_showDialog();
+                map_showDialog(markerId);
               },
               center: LatLng(latitude, longitude)),
+
           Positioned(
             top: 100,
             left: 10,
@@ -183,67 +214,135 @@ class _mapScreenState extends State<mapScreen> {
           markerId: 'markerId',
           latLng: LatLng(lat, lng),
         ));
-        map_showDialog();
+        map_showDialog('markerId');
       }
     }
   }
 
-  map_showDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierColor: Colors.white.withOpacity(0.0),
-      builder: (BuildContext context) {
-        return Stack(children: [
-          Positioned(
-            top: MediaQuery.of(context).size.height - 250,
-            child: AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
-              content: SizedOverflowBox(
-                size: const Size(280, 70),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("${removeaddress}",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          LikeButton(
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                      Text("${roadaddress}", style: TextStyle(fontSize: 12)),
-                      Row(
+  map_showDialog(String markerId) {
+    if (markerId == 'markerId') {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.white.withOpacity(0.0),
+        builder: (BuildContext context) {
+          return Stack(children: [
+            Positioned(
+              top: MediaQuery.of(context).size.height - 250,
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                content: SizedOverflowBox(
+                  size: const Size(280, 70),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("${jibunaddress}",
-                                style: TextStyle(fontSize: 12)),
-                            GestureDetector(
-                              onTap: () {
-                                bottom_sheet();
-                              },
-                              child: Row(children: [
-                                Text("리뷰보기", style: TextStyle(fontSize: 10)),
-                                Icon(
-                                  Icons.chevron_right,
-                                  size: 10,
-                                )
-                              ]),
-                            )
-                          ])
-                    ]),
+                            Text("${removeaddress}",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            LikeButton(
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                        Text("${roadaddress}", style: TextStyle(fontSize: 12)),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("${jibunaddress}",
+                                  style: TextStyle(fontSize: 12)),
+                              GestureDetector(
+                                onTap: () {
+                                  bottom_sheet();
+                                },
+                                child: Row(children: [
+                                  Text("리뷰보기", style: TextStyle(fontSize: 10)),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    size: 10,
+                                  )
+                                ]),
+                              )
+                            ])
+                      ]),
+                ),
               ),
-            ),
-          )
-        ]);
-      },
-    );
+            )
+          ]);
+        },
+      );
+    } else {
+      for (var data in mapmarkers) {
+        if (data.id.toString() == markerId) {
+          print('${data.location}');
+
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            barrierColor: Colors.white.withOpacity(0.0),
+            builder: (BuildContext context) {
+              return Stack(children: [
+                Positioned(
+                  top: MediaQuery.of(context).size.height - 250,
+                  child: AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    content: SizedOverflowBox(
+                      size: const Size(280, 70),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${data.location}",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                LikeButton(
+                                  size: 20,
+                                ),
+                              ],
+                            ),
+                            Text("${data.location}",
+                                style: TextStyle(fontSize: 12)),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("${data.location}",
+                                      style: TextStyle(fontSize: 12)),
+                                  GestureDetector(
+                                    onTap: () {
+                                      bottom_sheet();
+                                    },
+                                    child: Row(children: [
+                                      Text("리뷰보기",
+                                          style: TextStyle(fontSize: 10)),
+                                      Icon(
+                                        Icons.chevron_right,
+                                        size: 10,
+                                      )
+                                    ]),
+                                  )
+                                ])
+                          ]),
+                    ),
+                  ),
+                )
+              ]);
+            },
+          );
+        }
+      }
+    }
   }
 
   bottom_sheet() {

@@ -4,7 +4,6 @@ import 'package:oneroom_ex/common/default_layout.dart';
 import 'package:oneroom_ex/community/community_search.dart';
 import 'package:oneroom_ex/community/freeboard.dart';
 import 'package:oneroom_ex/community/tipboard.dart';
-
 import 'marketboard.dart';
 
 class communityScreen extends StatelessWidget {
@@ -25,11 +24,14 @@ class communityScreen extends StatelessWidget {
                 height: 70,
               ),
               OutlinedButton(
-                onPressed: () {Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CommunitySearchScreen(),
-                  ),
-                );},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          CommunitySearchScreen(),
+                    ),
+                  );
+                },
                 child: Text('search'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: BODY_TEXT_COLOR,
@@ -46,65 +48,83 @@ class communityScreen extends StatelessWidget {
                       EdgeInsets.symmetric(vertical: 12.0, horizontal: 130),
                 ),
               ),
-            //자유게시판
-            Container(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.black,))
-              ),
-              child: TextButton.icon(onPressed: (){
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => FreeBoardScreen(),
+              //자유게시판
+              Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                  color: Colors.black,
+                ))),
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => FreeBoardScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.chat_bubble_outline),
+                  label:
+                      Text('자유게시판                                       더보기>'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    textStyle:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
                   ),
-                );
-              }, icon: Icon(Icons.chat_bubble_outline), label: Text('자유게시판                                       더보기>'),
-                style: TextButton.styleFrom(
-                foregroundColor: Colors.black,
-                textStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
+                ),
               ),
-              ),
-            ),
               SizedBox(height: 20),
               //자취 꿀팁
               Container(
                 decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black,))
-                ),
-                child: TextButton.icon(onPressed: (){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => TipBoardScreen(),
-                    ),
-                  );
-                }, icon: Icon(Icons.chat_bubble_outline), label: Text('자취 꿀팁                                          더보기>'),
+                    border: Border(
+                        bottom: BorderSide(
+                  color: Colors.black,
+                ))),
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => TipBoardScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.chat_bubble_outline),
+                  label: Text(
+                      '자취 꿀팁                                          더보기>'),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
-                    textStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
+                    textStyle:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
               SizedBox(height: 20),
               Container(
                 decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black,))
-                ),
-                child: TextButton.icon(onPressed: (){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => MarketBoardScreen(),
-                    ),
-                  );
-                }, icon: Icon(Icons.chat_bubble_outline), label: Text('장터게시판                                       더보기>'),
+                    border: Border(
+                        bottom: BorderSide(
+                  color: Colors.black,
+                ))),
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => MarketBoardScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.chat_bubble_outline),
+                  label:
+                      Text('장터게시판                                       더보기>'),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
-                    textStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
+                    textStyle:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
               SizedBox(height: 20),
-
-
-
             ],
           ),
         ),
