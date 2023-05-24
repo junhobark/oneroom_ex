@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../common/default_layout.dart';
 
 class TipBoardScreen extends StatelessWidget {

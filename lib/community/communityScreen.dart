@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
-import 'package:oneroom_ex/community/community_search.dart';
+import 'package:oneroom_ex/community/communityScreen_Search.dart';
 import 'package:oneroom_ex/community/FreeBoard/freeboard.dart';
 import 'package:oneroom_ex/community/tipboard.dart';
+
 import 'marketboard.dart';
 
 class communityScreen extends StatelessWidget {

@@ -14,12 +14,13 @@ class CommunitySearchScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomTextFormField(
                 hintText: '글 제목, 내용',
                 onchanged: (String value) {},
               ),
+              SizedBox(height: 50),
+              Image.asset('asset/img/logo/Search_back.png')
             ],
           ),
         ),

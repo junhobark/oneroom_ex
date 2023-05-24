@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneroom_ex/common/colors.dart';
+
 import '../common/default_layout.dart';
 import 'myInfo/info_checking.dart';
 

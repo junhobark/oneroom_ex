@@ -5,6 +5,7 @@ import 'package:oneroom_ex/Info/info_written_board.dart';
 import 'package:oneroom_ex/Info/info_written_comment.dart';
 import 'package:oneroom_ex/Info/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
+import '../../login/loginpage.dart';
 
 class informationScreen extends StatefulWidget {
   const informationScreen({Key? key}) : super(key: key);
@@ -55,6 +56,14 @@ class _informationScreen extends State<informationScreen> {
         onPressed: () {
           _authentication.signOut();
           Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return SampleScreen();
+              },
+            ),
+          );
         },
         child: Text('로그아웃'),
       ),
