@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:oneroom_ex/community/FreeBoard/board_list.dart';
 import 'package:oneroom_ex/community/FreeBoard/board_write.dart';
 import 'package:oneroom_ex/community/FreeBoard/popular_board.dart';
-
-import '../../common/default_layout.dart';
 import '../communityScreen_Search.dart';
 
 class FreeBoardScreen extends StatelessWidget {

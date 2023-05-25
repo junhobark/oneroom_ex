@@ -9,6 +9,7 @@ import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
+import 'review_detail/review_class.dart';
 
 const String kakaoMapKey = '06fa866ad2a59ae0dfba2b8c9d47a578';
 
@@ -22,10 +23,12 @@ class mapScreen extends StatefulWidget {
 
 class _mapScreenState extends State<mapScreen> {
   String jsonData = '';
-  Future<List<Mapmarkers>> fetchData() async {
+  List<Mapmarkers> mapmarkers = [];
+  List<Reviewdetail> reviews = [];
+  Future<List<Mapmarkers>> markerfetchData() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/map/test'));
     if (response.statusCode == 200) {
-      print('응답했다');
+      print('응답했다1');
       print(utf8.decode(response.bodyBytes));
       final data = jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
       return data.map((item) => Mapmarkers.fromJson(item)).toList();
@@ -34,7 +37,20 @@ class _mapScreenState extends State<mapScreen> {
     }
   }
 
-  List<Mapmarkers> mapmarkers = [];
+  Future<List<Reviewdetail>> reviewfetchData(location) async {
+    final response = await http
+        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/detail'));
+    if (response.statusCode == 200) {
+      print('응답했다2');
+      final datadetail =
+          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+      print(datadetail.map((item) => Reviewdetail.fromJson(item)).toList());
+      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
   late KakaoMapController mapController;
   List<Marker> markers = [];
   var model = null;
@@ -47,12 +63,11 @@ class _mapScreenState extends State<mapScreen> {
   String kakaoLongitude = '';
   bool draggable = true;
   bool zoomable = true;
-  String mark_id = '';
 
   @override
   void initState() {
     super.initState();
-    fetchData().then((data) {
+    markerfetchData().then((data) {
       setState(() {
         mapmarkers = data;
       });
@@ -280,7 +295,7 @@ class _mapScreenState extends State<mapScreen> {
       for (var data in mapmarkers) {
         if (data.id.toString() == markerId) {
           print('${data.location}');
-
+          var location = data.location;
           showDialog(
             context: context,
             barrierDismissible: true,
@@ -321,7 +336,13 @@ class _mapScreenState extends State<mapScreen> {
                                       style: TextStyle(fontSize: 12)),
                                   GestureDetector(
                                     onTap: () {
-                                      bottom_sheet();
+                                      reviewfetchData(location)
+                                          .then((datadetail) {
+                                        setState(() {
+                                          reviews = datadetail;
+                                        });
+                                      });
+                                      bottom_sheetdata(location);
                                     },
                                     child: Row(children: [
                                       Text("리뷰보기",
@@ -341,6 +362,65 @@ class _mapScreenState extends State<mapScreen> {
             },
           );
         }
+      }
+    }
+  }
+
+  bottom_sheetdata(String location) {
+    for (var datadetail in reviews) {
+      if (location == datadetail.location) {
+        //     print('${datadetail.id}');
+        //     break;
+        //   }
+        showModalBottomSheet(
+          barrierColor: Colors.white.withOpacity(0.0),
+          isScrollControlled: false,
+          useRootNavigator: true,
+          useSafeArea: false,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+            side: const BorderSide(color: Colors.grey, width: 1),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("${datadetail.location}",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      LikeButton(
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Text("${datadetail.location}",
+                      style: TextStyle(fontSize: 12)),
+                  Text("${datadetail.location}",
+                      style: TextStyle(fontSize: 12)),
+                  SizedBox(height: 20),
+                  Divider(
+                    color: Colors.grey,
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 10),
+                  Text("리뷰",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                ],
+              ),
+            );
+          },
+        );
+        break;
       }
     }
   }
