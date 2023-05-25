@@ -296,6 +296,11 @@ class _mapScreenState extends State<mapScreen> {
         if (data.id.toString() == markerId) {
           print('${data.location}');
           var location = data.location;
+          reviewfetchData(location).then((datadetail) {
+            setState(() {
+              reviews = datadetail;
+            });
+          });
           showDialog(
             context: context,
             barrierDismissible: true,
@@ -336,12 +341,6 @@ class _mapScreenState extends State<mapScreen> {
                                       style: TextStyle(fontSize: 12)),
                                   GestureDetector(
                                     onTap: () {
-                                      reviewfetchData(location)
-                                          .then((datadetail) {
-                                        setState(() {
-                                          reviews = datadetail;
-                                        });
-                                      });
                                       bottom_sheetdata(location);
                                     },
                                     child: Row(children: [
