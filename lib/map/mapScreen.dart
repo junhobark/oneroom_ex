@@ -9,9 +9,10 @@ import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
-import 'package:oneroom_ex/map/review_detail/bodyclass.dart';
+import 'bottomsheet.dart';
 import 'review_detail/review_class.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 const String kakaoMapKey = '06fa866ad2a59ae0dfba2b8c9d47a578';
 
@@ -26,6 +27,7 @@ class mapScreen extends StatefulWidget {
 class _mapScreenState extends State<mapScreen> {
   String jsonData = '';
   List<Mapmarkers> mapmarkers = [];
+  List<Reviewdetail> reviews = [];
 
   Future<List<Mapmarkers>> markerfetchData() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/map/test'));
@@ -34,6 +36,20 @@ class _mapScreenState extends State<mapScreen> {
       print(utf8.decode(response.bodyBytes));
       final data = jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
       return data.map((item) => Mapmarkers.fromJson(item)).toList();
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
+  Future<List<Reviewdetail>> reviewfetchData(location) async {
+    final response = await http
+        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/detail'));
+    if (response.statusCode == 200) {
+      print('응답했다2');
+      final datadetail =
+          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+
+      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
     } else {
       throw Exception('Error: ${response.statusCode}');
     }
@@ -84,12 +100,11 @@ class _mapScreenState extends State<mapScreen> {
                 });
               }),
               markers: markers.toList(),
-              currentLevel: 5,
+              currentLevel: 1,
               onMarkerTap: (markerId, latLng, zoomLevel) {
                 map_showDialog(markerId);
               },
               center: LatLng(latitude, longitude)),
-
           Positioned(
             top: 100,
             left: 10,
@@ -181,7 +196,6 @@ class _mapScreenState extends State<mapScreen> {
                   ),
                 ),
               )),
-          // const MapBottomSheet()
         ],
       ),
     );
@@ -212,18 +226,22 @@ class _mapScreenState extends State<mapScreen> {
       selectedPlace = roadaddress;
       var lat = double.parse(kakaoLatitude);
       var lng = double.parse(kakaoLongitude);
+      int cn = 0;
       if (selectedPlace != null) {
         mapController.panTo(LatLng(lat, lng));
         for (var data in mapmarkers) {
-          if (data.posx != lat && data.posy != lng) {
+          if (data.location == roadaddress) {
             map_showDialog(data.id.toString());
-          } else {
-            markers.add(Marker(
-              markerId: 'markerId',
-              latLng: LatLng(lat, lng),
-            ));
-            map_showDialog('markerId');
+            cn = 1;
+            break;
           }
+        }
+        if (cn == 0) {
+          markers.add(Marker(
+            markerId: 'markerId',
+            latLng: LatLng(lat, lng),
+          ));
+          map_showDialog('markerId');
         }
       }
     }
@@ -233,41 +251,77 @@ class _mapScreenState extends State<mapScreen> {
     String markerId,
   ) {
     if (markerId == 'markerId') {
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        barrierColor: Colors.white.withOpacity(0.0),
-        builder: (BuildContext context) {
-          return Stack(children: [
-            Positioned(
-              top: MediaQuery.of(context).size.height - 250,
-              child: AlertDialog(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                content: SizedOverflowBox(
-                  size: const Size(280, 70),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${removeaddress}",
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                            LikeButton(
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                        Text("${roadaddress}", style: TextStyle(fontSize: 12)),
-                        Row(
+      Future.delayed(Duration(milliseconds: 150), () {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          barrierColor: Colors.white.withOpacity(0.0),
+          builder: (BuildContext context) {
+            return Stack(children: [
+              Positioned(
+                top: MediaQuery.of(context).size.height - 250,
+                child: AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  content: SizedOverflowBox(
+                    size: const Size(280, 70),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("${jibunaddress}",
+                              Text("${removeaddress}",
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              Row(
+                                children: [
+                                  LikeButton(
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    '0.0',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    '(리뷰 0)',
+                                    style: TextStyle(fontSize: 10),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("${roadaddress}",
                                   style: TextStyle(fontSize: 12)),
+                              RatingBarIndicator(
+                                rating: 0,
+                                itemBuilder: (context, index) => Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                itemCount: 5,
+                                itemSize: 12.0,
+                                direction: Axis.horizontal,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(""),
                               GestureDetector(
                                 onTap: () {
                                   bottom_sheet();
@@ -280,81 +334,147 @@ class _mapScreenState extends State<mapScreen> {
                                   )
                                 ]),
                               )
-                            ])
-                      ]),
+                            ],
+                          )
+                        ]),
+                  ),
                 ),
-              ),
-            )
-          ]);
-        },
-      );
+              )
+            ]);
+          },
+        );
+      });
     } else {
       for (var data in mapmarkers) {
         if (data.id.toString() == markerId) {
+          reviewfetchData(data.location).then((data) {
+            setState(() {
+              reviews = data;
+            });
+          });
           print('${data.location}');
           var location = data.location;
-          showDialog(
-            context: context,
-            barrierDismissible: true,
-            barrierColor: Colors.white.withOpacity(0.0),
-            builder: (BuildContext context) {
-              return Stack(children: [
-                Positioned(
-                  top: MediaQuery.of(context).size.height - 250,
-                  child: AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)),
-                    content: SizedOverflowBox(
-                      size: const Size(280, 70),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("${data.location}",
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                LikeButton(
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                            Text("${data.location}",
-                                style: TextStyle(fontSize: 12)),
-                            Row(
+          Future.delayed(Duration(milliseconds: 100), () {
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              barrierColor: Colors.white.withOpacity(0.0),
+              builder: (BuildContext context) {
+                return Stack(children: [
+                  Positioned(
+                    top: MediaQuery.of(context).size.height - 250,
+                    child: AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      content: SizedOverflowBox(
+                        size: const Size(280, 70),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                      "${data.location.replaceFirst('경남 진주시 ', '')}",
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  Row(
+                                    children: [
+                                      LikeButton(
+                                        size: 20,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        '${NumberFormat("#.#").format(totalgrade() / 4)}',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        '(리뷰 ${totalcount()})',
+                                        style: TextStyle(fontSize: 10),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("${data.location}",
                                       style: TextStyle(fontSize: 12)),
-                                  GestureDetector(
-                                    onTap: () {
-                                      bottom_sheetdata(location);
-                                    },
-                                    child: Row(children: [
-                                      Text("리뷰보기",
-                                          style: TextStyle(fontSize: 10)),
-                                      Icon(
-                                        Icons.chevron_right,
-                                        size: 10,
-                                      )
-                                    ]),
-                                  )
-                                ])
-                          ]),
+                                  RatingBarIndicator(
+                                    rating: totalgrade() / 4,
+                                    itemBuilder: (context, index) => Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                    ),
+                                    itemCount: 5,
+                                    itemSize: 12.0,
+                                    direction: Axis.horizontal,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "",
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        bottom_sheetdata(location);
+                                      },
+                                      child: Row(children: [
+                                        Text("리뷰보기",
+                                            style: TextStyle(fontSize: 10)),
+                                        Icon(
+                                          Icons.chevron_right,
+                                          size: 10,
+                                        )
+                                      ]),
+                                    )
+                                  ])
+                            ]),
+                      ),
                     ),
-                  ),
-                )
-              ]);
-            },
-          );
+                  )
+                ]);
+              },
+            );
+          });
         }
       }
     }
+  }
+
+  int totalcount() {
+    int count = 0;
+    // ignore: unused_local_variable
+    for (var data in reviews) {
+      count = count + 1;
+    }
+    return count;
+  }
+
+  double totalgrade() {
+    double grade = 0;
+    for (var data in reviews) {
+      grade = data.building.totalgrade;
+    }
+    return grade;
   }
 
   bottom_sheetdata(String location) {
@@ -397,13 +517,45 @@ class _mapScreenState extends State<mapScreen> {
                         maxLines: 1,
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
-                    LikeButton(
-                      size: 20,
+                    Row(
+                      children: [
+                        LikeButton(
+                          size: 20,
+                        ),
+                        SizedBox(width: 20),
+                        Text(
+                          '0.0',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          '(리뷰 0)',
+                          style: TextStyle(fontSize: 12),
+                        )
+                      ],
                     ),
                   ],
                 ),
                 SizedBox(height: 5),
-                Text("${roadaddress}", style: TextStyle(fontSize: 12)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${roadaddress}", style: TextStyle(fontSize: 12)),
+                    RatingBarIndicator(
+                      rating: 0,
+                      itemBuilder: (context, index) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      itemCount: 5,
+                      itemSize: 17.0,
+                      direction: Axis.horizontal,
+                    ),
+                  ],
+                ),
                 Text("${jibunaddress}", style: TextStyle(fontSize: 12)),
                 SizedBox(height: 20),
                 Divider(
@@ -412,7 +564,19 @@ class _mapScreenState extends State<mapScreen> {
                 ),
                 SizedBox(height: 10),
                 Text("리뷰",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Center(
+                    child: Container(
+                  padding: EdgeInsets.only(top: 110),
+                  child: Text(
+                    '리뷰가 없어요 😥',
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                )),
               ],
             ),
           );
@@ -424,194 +588,5 @@ class _mapScreenState extends State<mapScreen> {
     setState(() {
       markers.removeWhere((marker) => marker.markerId == markerId);
     });
-  }
-}
-
-class MyBottomSheet extends StatefulWidget {
-  final String location;
-
-  MyBottomSheet(this.location);
-
-  @override
-  _MyBottomSheetState createState() => _MyBottomSheetState();
-}
-
-class _MyBottomSheetState extends State<MyBottomSheet> {
-  List<Reviewdetail> reviews = [];
-  Future<List<Reviewdetail>> reviewfetchData() async {
-    final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/map/${widget.location}/detail'));
-    if (response.statusCode == 200) {
-      print('응답했다2');
-      final datadetail =
-          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-
-      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
-    } else {
-      throw Exception('Error: ${response.statusCode}');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    reviewfetchData().then((data) {
-      setState(() {
-        reviews = data;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("${widget.location}",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              LikeButton(
-                size: 20,
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Text("${widget.location}", style: TextStyle(fontSize: 12)),
-          Text("${widget.location}", style: TextStyle(fontSize: 12)),
-          SizedBox(height: 20),
-          Divider(
-            color: Colors.grey,
-            thickness: 2,
-          ),
-          SizedBox(height: 10),
-          Text("리뷰",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(
-            height: 20,
-          ),
-          FutureBuilder<List<Reviewdetail>>(
-            future: reviewfetchData(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Expanded(
-                  child: ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        Reviewdetail reviews = snapshot.data![index];
-                        Body body = reviews.body;
-                        return Container(
-                          child: ListTile(
-                            title: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.account_circle,
-                                      size: 35,
-                                    ),
-                                    Text(
-                                      "익명${reviews.id}",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 20),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      '${DateFormat("MM/dd HH:mm").format(reviews.modifiedAt)}',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.grey,
-                                          fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                )
-                              ],
-                            ),
-                            subtitle: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text('장점',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue,
-                                        fontSize: 15)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text("${body.advantage}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black,
-                                        fontSize: 15)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('단점',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
-                                        fontSize: 15)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('${body.weakness}',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black,
-                                        fontSize: 15)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('기타',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
-                                        fontSize: 15)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('${body.etc}',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black,
-                                        fontSize: 15)),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Divider(
-                                  thickness: 1,
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}에러!!");
-              }
-              return CircularProgressIndicator();
-            },
-          ),
-        ],
-      ),
-    );
   }
 }
