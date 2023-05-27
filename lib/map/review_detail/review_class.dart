@@ -8,8 +8,8 @@ part 'review_class.g.dart';
 
 @JsonSerializable()
 class Reviewdetail {
-  final String createdAt;
-  final String modifiedAt;
+  final DateTime createdAt;
+  final DateTime modifiedAt;
   final int id;
   final Building building;
   final Body body;

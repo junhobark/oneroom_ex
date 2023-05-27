@@ -7,8 +7,8 @@ part of 'review_class.dart';
 // **************************************************************************
 
 Reviewdetail _$ReviewdetailFromJson(Map<String, dynamic> json) => Reviewdetail(
-      createdAt: json['createdAt'] as String,
-      modifiedAt: json['modifiedAt'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      modifiedAt: DateTime.parse(json['modifiedAt'] as String),
       id: json['id'] as int,
       building: Building.fromJson(json['building'] as Map<String, dynamic>),
       body: Body.fromJson(json['body'] as Map<String, dynamic>),
@@ -18,8 +18,8 @@ Reviewdetail _$ReviewdetailFromJson(Map<String, dynamic> json) => Reviewdetail(
 
 Map<String, dynamic> _$ReviewdetailToJson(Reviewdetail instance) =>
     <String, dynamic>{
-      'createdAt': instance.createdAt,
-      'modifiedAt': instance.modifiedAt,
+      'createdAt': instance.createdAt.toIso8601String(),
+      'modifiedAt': instance.modifiedAt.toIso8601String(),
       'id': instance.id,
       'building': instance.building,
       'body': instance.body,

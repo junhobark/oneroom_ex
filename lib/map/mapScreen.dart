@@ -11,6 +11,7 @@ import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:oneroom_ex/map/review_detail/bodyclass.dart';
 import 'review_detail/review_class.dart';
+import 'package:intl/intl.dart';
 
 const String kakaoMapKey = '06fa866ad2a59ae0dfba2b8c9d47a578';
 
@@ -486,11 +487,14 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
           SizedBox(height: 20),
           Divider(
             color: Colors.grey,
-            thickness: 1,
+            thickness: 2,
           ),
           SizedBox(height: 10),
           Text("리뷰",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(
+            height: 20,
+          ),
           FutureBuilder<List<Reviewdetail>>(
             future: reviewfetchData(),
             builder: (context, snapshot) {
@@ -503,15 +507,99 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                         Body body = reviews.body;
                         return Container(
                           child: ListTile(
-                            title: Text(
-                              "${body.advantage}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal, fontSize: 10),
+                            title: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.account_circle,
+                                      size: 35,
+                                    ),
+                                    Text(
+                                      "익명${reviews.id}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '${DateFormat("MM/dd HH:mm").format(reviews.modifiedAt)}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.grey,
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                )
+                              ],
                             ),
-                            subtitle: Text("${body.weakness}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 10)),
+                            subtitle: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text('장점',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue,
+                                        fontSize: 15)),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text("${body.advantage}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.black,
+                                        fontSize: 15)),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text('단점',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                        fontSize: 15)),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text('${body.weakness}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.black,
+                                        fontSize: 15)),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text('기타',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green,
+                                        fontSize: 15)),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text('${body.etc}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.black,
+                                        fontSize: 15)),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Divider(
+                                  thickness: 1,
+                                )
+                              ],
+                            ),
                           ),
                         );
                       }),
