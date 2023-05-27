@@ -9,6 +9,7 @@ import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:oneroom_ex/map/review_detail/bodyclass.dart';
 import 'review_detail/review_class.dart';
 
 const String kakaoMapKey = '06fa866ad2a59ae0dfba2b8c9d47a578';
@@ -24,7 +25,7 @@ class mapScreen extends StatefulWidget {
 class _mapScreenState extends State<mapScreen> {
   String jsonData = '';
   List<Mapmarkers> mapmarkers = [];
-  List<Reviewdetail> reviews = [];
+
   Future<List<Mapmarkers>> markerfetchData() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/map/test'));
     if (response.statusCode == 200) {
@@ -32,20 +33,6 @@ class _mapScreenState extends State<mapScreen> {
       print(utf8.decode(response.bodyBytes));
       final data = jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
       return data.map((item) => Mapmarkers.fromJson(item)).toList();
-    } else {
-      throw Exception('Error: ${response.statusCode}');
-    }
-  }
-
-  Future<List<Reviewdetail>> reviewfetchData(location) async {
-    final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/detail'));
-    if (response.statusCode == 200) {
-      print('응답했다2');
-      final datadetail =
-          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-      print(datadetail.map((item) => Reviewdetail.fromJson(item)).toList());
-      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
     } else {
       throw Exception('Error: ${response.statusCode}');
     }
@@ -83,18 +70,20 @@ class _mapScreenState extends State<mapScreen> {
       child: Stack(
         children: [
           KakaoMap(
-              onMapCreated: ((KakaoMapController controller) async {
+              onMapCreated: ((controller) async {
                 mapController = controller;
-                mapmarkers.map((data) {
-                  markers.add(Marker(
-                      markerId: data.id.toString(),
-                      latLng: LatLng(data.posx, data.posy),
-                      markerImageSrc:
-                          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
-                }).toList();
+                setState(() {
+                  mapmarkers.map((data) {
+                    markers.add(Marker(
+                        markerId: data.id.toString(),
+                        latLng: LatLng(data.posx, data.posy),
+                        markerImageSrc:
+                            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
+                  }).toList();
+                });
               }),
               markers: markers.toList(),
-              currentLevel: 1,
+              currentLevel: 5,
               onMarkerTap: (markerId, latLng, zoomLevel) {
                 map_showDialog(markerId);
               },
@@ -224,17 +213,24 @@ class _mapScreenState extends State<mapScreen> {
       var lng = double.parse(kakaoLongitude);
       if (selectedPlace != null) {
         mapController.panTo(LatLng(lat, lng));
-
-        markers.add(Marker(
-          markerId: 'markerId',
-          latLng: LatLng(lat, lng),
-        ));
-        map_showDialog('markerId');
+        for (var data in mapmarkers) {
+          if (data.posx != lat && data.posy != lng) {
+            map_showDialog(data.id.toString());
+          } else {
+            markers.add(Marker(
+              markerId: 'markerId',
+              latLng: LatLng(lat, lng),
+            ));
+            map_showDialog('markerId');
+          }
+        }
       }
     }
   }
 
-  map_showDialog(String markerId) {
+  map_showDialog(
+    String markerId,
+  ) {
     if (markerId == 'markerId') {
       showDialog(
         context: context,
@@ -296,11 +292,6 @@ class _mapScreenState extends State<mapScreen> {
         if (data.id.toString() == markerId) {
           print('${data.location}');
           var location = data.location;
-          reviewfetchData(location).then((datadetail) {
-            setState(() {
-              reviews = datadetail;
-            });
-          });
           showDialog(
             context: context,
             barrierDismissible: true,
@@ -366,65 +357,6 @@ class _mapScreenState extends State<mapScreen> {
   }
 
   bottom_sheetdata(String location) {
-    for (var datadetail in reviews) {
-      if (location == datadetail.location) {
-        //     print('${datadetail.id}');
-        //     break;
-        //   }
-        showModalBottomSheet(
-          barrierColor: Colors.white.withOpacity(0.0),
-          isScrollControlled: false,
-          useRootNavigator: true,
-          useSafeArea: false,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-            side: const BorderSide(color: Colors.grey, width: 1),
-          ),
-          context: context,
-          builder: (BuildContext context) {
-            return Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("${datadetail.location}",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      LikeButton(
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Text("${datadetail.location}",
-                      style: TextStyle(fontSize: 12)),
-                  Text("${datadetail.location}",
-                      style: TextStyle(fontSize: 12)),
-                  SizedBox(height: 20),
-                  Divider(
-                    color: Colors.grey,
-                    thickness: 1,
-                  ),
-                  SizedBox(height: 10),
-                  Text("리뷰",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                ],
-              ),
-            );
-          },
-        );
-        break;
-      }
-    }
-  }
-
-  bottom_sheet() {
     showModalBottomSheet(
       barrierColor: Colors.white.withOpacity(0.0),
       isScrollControlled: false,
@@ -435,41 +367,55 @@ class _mapScreenState extends State<mapScreen> {
         side: const BorderSide(color: Colors.grey, width: 1),
       ),
       context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("${removeaddress}",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  LikeButton(
-                    size: 20,
-                  ),
-                ],
-              ),
-              SizedBox(height: 5),
-              Text("${roadaddress}", style: TextStyle(fontSize: 12)),
-              Text("${jibunaddress}", style: TextStyle(fontSize: 12)),
-              SizedBox(height: 20),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-              SizedBox(height: 10),
-              Text("리뷰",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-            ],
-          ),
-        );
-      },
+      builder: (BuildContext context) => MyBottomSheet(location),
     );
+  }
+
+  bottom_sheet() {
+    showModalBottomSheet(
+        barrierColor: Colors.white.withOpacity(0.0),
+        isScrollControlled: false,
+        useRootNavigator: true,
+        useSafeArea: false,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+          side: const BorderSide(color: Colors.grey, width: 1),
+        ),
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${removeaddress}",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    LikeButton(
+                      size: 20,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Text("${roadaddress}", style: TextStyle(fontSize: 12)),
+                Text("${jibunaddress}", style: TextStyle(fontSize: 12)),
+                SizedBox(height: 20),
+                Divider(
+                  color: Colors.grey,
+                  thickness: 1,
+                ),
+                SizedBox(height: 10),
+                Text("리뷰",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+              ],
+            ),
+          );
+        });
   }
 
   void removeMarker() {
@@ -477,5 +423,107 @@ class _mapScreenState extends State<mapScreen> {
     setState(() {
       markers.removeWhere((marker) => marker.markerId == markerId);
     });
+  }
+}
+
+class MyBottomSheet extends StatefulWidget {
+  final String location;
+
+  MyBottomSheet(this.location);
+
+  @override
+  _MyBottomSheetState createState() => _MyBottomSheetState();
+}
+
+class _MyBottomSheetState extends State<MyBottomSheet> {
+  List<Reviewdetail> reviews = [];
+  Future<List<Reviewdetail>> reviewfetchData() async {
+    final response = await http
+        .get(Uri.parse('http://10.0.2.2:8080/map/${widget.location}/detail'));
+    if (response.statusCode == 200) {
+      print('응답했다2');
+      final datadetail =
+          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+
+      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    reviewfetchData().then((data) {
+      setState(() {
+        reviews = data;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("${widget.location}",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              LikeButton(
+                size: 20,
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          Text("${widget.location}", style: TextStyle(fontSize: 12)),
+          Text("${widget.location}", style: TextStyle(fontSize: 12)),
+          SizedBox(height: 20),
+          Divider(
+            color: Colors.grey,
+            thickness: 1,
+          ),
+          SizedBox(height: 10),
+          Text("리뷰",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          FutureBuilder<List<Reviewdetail>>(
+            future: reviewfetchData(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Expanded(
+                  child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        Reviewdetail reviews = snapshot.data![index];
+                        Body body = reviews.body;
+                        return Container(
+                          child: ListTile(
+                            title: Text(
+                              "${body.advantage}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.normal, fontSize: 10),
+                            ),
+                            subtitle: Text("${body.weakness}",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 10)),
+                          ),
+                        );
+                      }),
+                );
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}에러!!");
+              }
+              return CircularProgressIndicator();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
