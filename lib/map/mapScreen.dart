@@ -251,7 +251,7 @@ class _mapScreenState extends State<mapScreen> {
     String markerId,
   ) {
     if (markerId == 'markerId') {
-      Future.delayed(Duration(milliseconds: 150), () {
+      Future.delayed(Duration(milliseconds: 200), () {
         showDialog(
           context: context,
           barrierDismissible: true,
@@ -354,7 +354,7 @@ class _mapScreenState extends State<mapScreen> {
           });
           print('${data.location}');
           var location = data.location;
-          Future.delayed(Duration(milliseconds: 100), () {
+          Future.delayed(Duration(milliseconds: 200), () {
             showDialog(
               context: context,
               barrierDismissible: true,
