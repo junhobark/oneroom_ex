@@ -27,7 +27,6 @@ class _SampleScreenState extends State<SampleScreen> {
     var url = Uri.parse('http://10.0.2.2:8080/user/sign');
     Map data = {
       "id": uuid,
-      "valid": null,
       "location": location,
       "name": username,
       "nickName": usernickname,

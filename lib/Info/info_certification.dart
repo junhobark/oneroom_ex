@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneroom_ex/common/colors.dart';
-
+import 'package:kpostal/kpostal.dart';
 import '../common/default_layout.dart';
+import '../map/mapScreen.dart';
 import 'myInfo/info_checking.dart';
 
 void main() {
@@ -21,7 +23,9 @@ class CertificationScreen extends StatefulWidget {
 class _CertificationScreenState extends State<CertificationScreen> {
   XFile? _image; //이미지를 담을 변수 선언
   final ImagePicker picker = ImagePicker(); //ImagePicker 초기화
-
+  final InputController = TextEditingController();
+  String roadaddress = '';
+  var model = null;
   //이미지를 가져오는 함수
   Future getImage(ImageSource imageSource) async {
     //pickedFile에 ImagePicker로 가져온 이미지가 담긴다.
@@ -52,6 +56,45 @@ class _CertificationScreenState extends State<CertificationScreen> {
                   fontWeight: FontWeight.w700,
                   color: BODY_TEXT_COLOR,
                 ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 260,
+                    height: 50,
+                    child: TextField(
+                      enabled: false,
+                      decoration: InputDecoration(
+                        hintText: '주소를 입력해주세요',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                          borderSide: BorderSide(width: 1, color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                          borderSide: BorderSide(width: 1, color: Colors.grey),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                        ),
+                      ),
+                      controller: InputController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _addressAPI();
+                    },
+                  )
+                ],
               ),
               _buildPhotoArea(),
               _buildButton(),
@@ -121,5 +164,26 @@ class _CertificationScreenState extends State<CertificationScreen> {
         ),
       ],
     );
+  }
+
+  _addressAPI() async {
+    var model = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KpostalView(
+          useLocalServer: false,
+          localPort: 8080,
+          kakaoKey: kakaoMapKey,
+          callback: (Kpostal result) {
+            setState(() {
+              this.roadaddress = result.roadAddress;
+            });
+          },
+        ),
+      ),
+    );
+    if (model != null) {
+      InputController.text = '${roadaddress}';
+    }
   }
 }
