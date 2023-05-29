@@ -8,10 +8,11 @@ import 'package:kpostal/kpostal.dart';
 import 'package:provider/provider.dart';
 import '../common/default_layout.dart';
 import '../login/uid.dart';
+import '../login/users.dart';
 import '../map/mapScreen.dart';
-import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const CertificationScreen());
@@ -31,7 +32,7 @@ class _CertificationScreenState extends State<CertificationScreen> {
   String roadaddress = '';
   var model = null;
   String id = '';
-  Future<void> sendPostRequest(uid, location, image) async {
+  Future<String> sendPostRequest(uid, location) async {
     final dio = Dio();
     var url = 'http://10.0.2.2:8080/user/authorization/write';
 
@@ -45,7 +46,8 @@ class _CertificationScreenState extends State<CertificationScreen> {
         jsonEncode(locRequestForm),
         contentType: MediaType('application', 'json'),
       ),
-      'file': await MultipartFile.fromFile(_image!.path, filename: 'file'),
+      'file':
+          await MultipartFile.fromFile(_image!.path, filename: _image!.name),
     });
 
     try {
@@ -60,13 +62,39 @@ class _CertificationScreenState extends State<CertificationScreen> {
         // POST 요청이 성공한 경우
         print('POST 요청 성공!');
         print('POST 요청 상태 코드: ${response.statusCode}');
+        String data = '성공';
+        return data;
       } else {
         // POST 요청이 실패한 경우
+        print(' ${_image!.name}');
         print('POST 요청 실패. 상태 코드: ${response.statusCode}');
+        String data = '실패';
+        return data;
       }
     } catch (e) {
       // 네트워크 오류 등 예외 처리
       print('POST 요청 오류: $e');
+      print(' ${_image!.name}');
+      String data = '실패';
+      return data;
+    }
+  }
+
+  Future<String> userfetchData(uid) async {
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
+    if (response.statusCode == 200) {
+      print('응답했다3');
+      print(utf8.decode(response.bodyBytes));
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      print(Users.fromJson(data));
+      var _data = Users.fromJson(data);
+      Provider.of<UIDProvider>(context, listen: false)
+          .setdbToken(_data.nickName, _data.location, _data.valid);
+      return _data.valid;
+    } else {
+      print('Error: ${response.statusCode}');
+      throw Exception('Error: ${response.statusCode}');
     }
   }
 
@@ -251,16 +279,21 @@ class _CertificationScreenState extends State<CertificationScreen> {
                         fontWeight: FontWeight.w700,
                         color: Colors.black),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     print(
                         "${Provider.of<UIDProvider>(context, listen: false).uid},${InputController.text},${_image}");
-                    File image = File(_image!.path);
+
                     String uid =
                         Provider.of<UIDProvider>(context, listen: false).uid;
                     String location = InputController.text;
-                    sendPostRequest(uid, location, image);
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    CircularProgressIndicator();
+                    // ignore: unused_local_variable
+                    String data1 = await sendPostRequest(uid, location);
+                    // ignore: unused_local_variable
+                    String data2 = await userfetchData(uid);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    update();
                   },
                 ),
               ),
@@ -283,5 +316,9 @@ class _CertificationScreenState extends State<CertificationScreen> {
         );
       },
     );
+  }
+
+  void update() {
+    setState(() {});
   }
 }

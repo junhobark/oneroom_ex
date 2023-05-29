@@ -19,5 +19,6 @@ class UIDProvider extends ChangeNotifier {
     this.nickname = nickname;
     this.location = location;
     this.valid = valid;
+    notifyListeners();
   }
 }

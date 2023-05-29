@@ -9,7 +9,7 @@ import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
-import 'bottomsheet.dart';
+import 'map_bottomsheet.dart';
 import 'review_detail/review_class.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -88,9 +88,10 @@ class _mapScreenState extends State<mapScreen> {
         children: [
           KakaoMap(
               onMapCreated: ((controller) async {
-                mapController = controller;
                 setState(() {
-                  mapmarkers.map((data) {
+                  mapController = controller;
+                  markers.clear();
+                  mapmarkers.map((data) async {
                     markers.add(Marker(
                         markerId: data.id.toString(),
                         latLng: LatLng(data.posx, data.posy),
@@ -389,7 +390,7 @@ class _mapScreenState extends State<mapScreen> {
                                       ),
                                       SizedBox(width: 10),
                                       Text(
-                                        '${NumberFormat("#.#").format(totalgrade() / 4)}',
+                                        '${NumberFormat("#.#").format(totalgrade() / (4 * totalcount()))}',
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold),
@@ -472,7 +473,11 @@ class _mapScreenState extends State<mapScreen> {
   double totalgrade() {
     double grade = 0;
     for (var data in reviews) {
-      grade = data.building.totalgrade;
+      grade = grade +
+          (data.grade.area +
+              data.grade.lessor +
+              data.grade.noise +
+              data.grade.quality);
     }
     return grade;
   }

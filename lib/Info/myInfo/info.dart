@@ -24,6 +24,18 @@ class _informationScreen extends State<informationScreen> {
 
   void initState() {
     super.initState();
+    getCurrentUser();
+  }
+
+  void getCurrentUser() {
+    try {
+      final user = _authentication.currentUser;
+      if (user != null) {
+        loggedUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Widget _logoutButton() {
@@ -163,14 +175,18 @@ class _informationScreen extends State<informationScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            CertificationScreen(),
-                      ),
-                    );
-                  },
+                  onPressed:
+                      (Provider.of<UIDProvider>(context, listen: false).valid ==
+                              "UNCERTIFIED")
+                          ? () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      CertificationScreen(),
+                                ),
+                              );
+                            }
+                          : null,
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),

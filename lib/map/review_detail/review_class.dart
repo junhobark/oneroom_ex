@@ -1,7 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'bodyclass.dart';
-import 'buildingclass.dart';
 import 'gradeclass.dart';
 
 part 'review_class.g.dart';
@@ -11,7 +10,7 @@ class Reviewdetail {
   final DateTime createdAt;
   final DateTime modifiedAt;
   final int id;
-  final Building building;
+  final int buildingId;
   final Body body;
   final Grade grade;
   final String location;
@@ -20,7 +19,7 @@ class Reviewdetail {
     required this.createdAt,
     required this.modifiedAt,
     required this.id,
-    required this.building,
+    required this.buildingId,
     required this.body,
     required this.grade,
     required this.location,

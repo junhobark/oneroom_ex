@@ -66,7 +66,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                   ),
                   SizedBox(width: 20),
                   Text(
-                    '${NumberFormat("#.#").format(totalgrade() / 4)}',
+                    '${NumberFormat("#.#").format(totalgrade() / (4 * totalcount()))}',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -268,7 +268,11 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
   double totalgrade() {
     double grade = 0;
     for (var data in reviews) {
-      grade = data.building.totalgrade;
+      grade = grade +
+          (data.grade.area +
+              data.grade.lessor +
+              data.grade.noise +
+              data.grade.quality);
     }
     return grade;
   }
