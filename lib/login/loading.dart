@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/root_tab.dart';
-import 'my_location.dart';
 
-//const apiKey = '576adcb7384fbb0cb29efa2e549fba64';
+import 'my_location.dart';
 
 class Loading extends StatefulWidget {
   @override
@@ -24,7 +23,6 @@ class _LoadingState extends State<Loading> {
     longitude3 = myLocation.longitude2;
     print(latitude3);
     print(longitude3);
-
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return RootTab(latitude: latitude3, longitude: longitude3);
     }));

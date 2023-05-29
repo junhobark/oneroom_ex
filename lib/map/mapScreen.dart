@@ -202,7 +202,7 @@ class _mapScreenState extends State<mapScreen> {
   }
 
   _addressAPI() async {
-    var model = await Navigator.push(
+    model = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => KpostalView(

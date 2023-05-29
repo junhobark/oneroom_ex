@@ -5,7 +5,9 @@ import 'package:oneroom_ex/Info/info_written_board.dart';
 import 'package:oneroom_ex/Info/info_written_comment.dart';
 import 'package:oneroom_ex/Info/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
+import 'package:provider/provider.dart';
 import '../../login/loginpage.dart';
+import '../../login/uid.dart';
 
 class informationScreen extends StatefulWidget {
   const informationScreen({Key? key}) : super(key: key);
@@ -18,20 +20,10 @@ class _informationScreen extends State<informationScreen> {
   final _authentication = FirebaseAuth.instance;
   User? loggedUser;
 
+  var users;
+
   void initState() {
     super.initState();
-    getCurrentUser();
-  }
-
-  void getCurrentUser() {
-    try {
-      final user = _authentication.currentUser;
-      if (user != null) {
-        loggedUser = user;
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   Widget _logoutButton() {
@@ -87,7 +79,7 @@ class _informationScreen extends State<informationScreen> {
                     height: 100,
                   ),
                   Text(
-                    'GNU18@naver.com',
+                    '${Provider.of<UIDProvider>(context).nickname}님',
                     style: TextStyle(
                       fontSize: 22.0,
                       fontWeight: FontWeight.w700,
@@ -119,14 +111,40 @@ class _informationScreen extends State<informationScreen> {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            TextSpan(
-                              text: '\n거주지를 인증해주세요',
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.w700,
-                                color: PRIMARY_COLOR,
+                            if (Provider.of<UIDProvider>(context, listen: false)
+                                    .valid ==
+                                "UNCERTIFIED")
+                              TextSpan(
+                                text: '\n거주지를 인증해주세요',
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: PRIMARY_COLOR,
+                                ),
                               ),
-                            ),
+                            if (Provider.of<UIDProvider>(context, listen: false)
+                                    .valid ==
+                                "ONGOING")
+                              TextSpan(
+                                text: '\n인증중입니다(기다려주세요)',
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: BODY_TEXT_COLOR,
+                                ),
+                              ),
+                            if (Provider.of<UIDProvider>(context, listen: false)
+                                    .valid ==
+                                "CERTIFIED")
+                              TextSpan(
+                                text:
+                                    '\n${Provider.of<UIDProvider>(context).location}',
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black,
+                                ),
+                              ),
                           ],
                         ),
                       ),

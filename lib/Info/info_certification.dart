@@ -1,13 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:kpostal/kpostal.dart';
+import 'package:provider/provider.dart';
 import '../common/default_layout.dart';
+import '../login/uid.dart';
 import '../map/mapScreen.dart';
-import 'myInfo/info_checking.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const CertificationScreen());
@@ -26,6 +28,38 @@ class _CertificationScreenState extends State<CertificationScreen> {
   final InputController = TextEditingController();
   String roadaddress = '';
   var model = null;
+  String id = '';
+  Future<void> sendPostRequest() async {
+    var client = new http.Client();
+    var url = Uri.parse('http://10.0.2.2:8080/user/authorization/write');
+    http.MultipartRequest request = http.MultipartRequest('POST', url);
+    Map<String, dynamic> jsonData = {
+      'memberId': Provider.of<UIDProvider>(context, listen: false).uid,
+      'location': InputController.text,
+    };
+    request.fields['LocRequestForm'] = json.encode(jsonData);
+    request.files.add(await http.MultipartFile.fromPath('file', _image!.path));
+
+    try {
+      var response = await request.send();
+      var responseString = await response.stream.bytesToString();
+      print(responseString);
+      if (response.statusCode == 200) {
+        // POST 요청이 성공한 경우
+        print('POST 요청 성공!');
+        print('POST 요청 상태 코드: ${response.statusCode}');
+      } else {
+        // POST 요청이 실패한 경우
+        print('POST 요청 실패. 상태 코드: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 네트워크 오류 등 예외 처리
+      print('POST 요청 오류: $e');
+    } finally {
+      client.close();
+    }
+  }
+
   //이미지를 가져오는 함수
   Future getImage(ImageSource imageSource) async {
     //pickedFile에 ImagePicker로 가져온 이미지가 담긴다.
@@ -70,11 +104,11 @@ class _CertificationScreenState extends State<CertificationScreen> {
                         labelStyle: TextStyle(color: Colors.grey),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                          borderSide: BorderSide(width: 1, color: Colors.grey),
+                          borderSide: BorderSide(width: 2, color: Colors.grey),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                          borderSide: BorderSide(width: 1, color: Colors.grey),
+                          borderSide: BorderSide(width: 2, color: Colors.grey),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(3.0)),
@@ -99,14 +133,11 @@ class _CertificationScreenState extends State<CertificationScreen> {
               _buildPhotoArea(),
               _buildButton(),
               ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            informationCheckingScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: (model != null && _image != null)
+                      ? () {
+                          showMyDialog();
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: PRIMARY_COLOR,
                     foregroundColor: Colors.white,
@@ -167,7 +198,7 @@ class _CertificationScreenState extends State<CertificationScreen> {
   }
 
   _addressAPI() async {
-    var model = await Navigator.push(
+    model = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => KpostalView(
@@ -185,5 +216,59 @@ class _CertificationScreenState extends State<CertificationScreen> {
     if (model != null) {
       InputController.text = '${roadaddress}';
     }
+  }
+
+  void showMyDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text(
+            '제출하실건가요?',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          actions: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              Container(
+                child: TextButton(
+                  child: Text(
+                    '네',
+                    style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black),
+                  ),
+                  onPressed: () {
+                    print(
+                        "${Provider.of<UIDProvider>(context, listen: false).uid},${InputController.text},${_image}");
+
+                    sendPostRequest();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              Container(
+                child: TextButton(
+                  child: Text(
+                    '아니요',
+                    style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ])
+          ],
+        );
+      },
+    );
   }
 }

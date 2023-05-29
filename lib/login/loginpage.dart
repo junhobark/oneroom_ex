@@ -27,6 +27,7 @@ class _SampleScreenState extends State<SampleScreen> {
     var url = Uri.parse('http://10.0.2.2:8080/user/sign');
     Map data = {
       "id": uuid,
+      "valid": null,
       "location": location,
       "name": username,
       "nickName": usernickname,
@@ -80,10 +81,6 @@ class _SampleScreenState extends State<SampleScreen> {
                   email: userEmail,
                   password: 'password',
                 );
-                print('accessToken = ${result.accessToken}');
-                print('nickname = ${result.account.nickname}');
-                print('email = ${userEmail}');
-                print('name = ${userName}');
                 String uid = newUser1.user!.uid;
                 print('UID: ${uid}');
                 sendPostRequest(uid, location, result.account.name,
