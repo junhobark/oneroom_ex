@@ -10,6 +10,8 @@ import '../common/default_layout.dart';
 import '../login/uid.dart';
 import '../map/mapScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 void main() {
   runApp(const CertificationScreen());
@@ -29,21 +31,31 @@ class _CertificationScreenState extends State<CertificationScreen> {
   String roadaddress = '';
   var model = null;
   String id = '';
-  Future<void> sendPostRequest() async {
-    var client = new http.Client();
-    var url = Uri.parse('http://10.0.2.2:8080/user/authorization/write');
-    http.MultipartRequest request = http.MultipartRequest('POST', url);
-    Map<String, dynamic> jsonData = {
-      'memberId': Provider.of<UIDProvider>(context, listen: false).uid,
-      'location': InputController.text,
+  Future<void> sendPostRequest(uid, location, image) async {
+    final dio = Dio();
+    var url = 'http://10.0.2.2:8080/user/authorization/write';
+
+    Map<String, dynamic> locRequestForm = {
+      'memberId': uid,
+      'location': location,
     };
-    request.fields['LocRequestForm'] = json.encode(jsonData);
-    request.files.add(await http.MultipartFile.fromPath('file', _image!.path));
+
+    FormData formData = FormData.fromMap({
+      'locRequestForm': MultipartFile.fromString(
+        jsonEncode(locRequestForm),
+        contentType: MediaType('application', 'json'),
+      ),
+      'file': await MultipartFile.fromFile(_image!.path, filename: 'file'),
+    });
 
     try {
-      var response = await request.send();
-      var responseString = await response.stream.bytesToString();
-      print(responseString);
+      Response response = await dio.post(
+        url,
+        data: formData,
+        options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+        ),
+      );
       if (response.statusCode == 200) {
         // POST 요청이 성공한 경우
         print('POST 요청 성공!');
@@ -55,8 +67,6 @@ class _CertificationScreenState extends State<CertificationScreen> {
     } catch (e) {
       // 네트워크 오류 등 예외 처리
       print('POST 요청 오류: $e');
-    } finally {
-      client.close();
     }
   }
 
@@ -244,8 +254,11 @@ class _CertificationScreenState extends State<CertificationScreen> {
                   onPressed: () {
                     print(
                         "${Provider.of<UIDProvider>(context, listen: false).uid},${InputController.text},${_image}");
-
-                    sendPostRequest();
+                    File image = File(_image!.path);
+                    String uid =
+                        Provider.of<UIDProvider>(context, listen: false).uid;
+                    String location = InputController.text;
+                    sendPostRequest(uid, location, image);
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
                   },
