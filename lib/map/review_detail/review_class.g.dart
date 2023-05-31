@@ -14,6 +14,9 @@ Reviewdetail _$ReviewdetailFromJson(Map<String, dynamic> json) => Reviewdetail(
       body: Body.fromJson(json['body'] as Map<String, dynamic>),
       grade: Grade.fromJson(json['grade'] as Map<String, dynamic>),
       location: json['location'] as String,
+      images: (json['images'] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
+          .toList(),
     );
 
 Map<String, dynamic> _$ReviewdetailToJson(Reviewdetail instance) =>
@@ -25,4 +28,5 @@ Map<String, dynamic> _$ReviewdetailToJson(Reviewdetail instance) =>
       'body': instance.body,
       'grade': instance.grade,
       'location': instance.location,
+      'images': instance.images,
     };

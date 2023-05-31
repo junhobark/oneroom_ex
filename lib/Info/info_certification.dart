@@ -7,7 +7,7 @@ import 'package:oneroom_ex/common/colors.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:provider/provider.dart';
 import '../common/default_layout.dart';
-import '../login/uid.dart';
+import '../login/uid_provider.dart';
 import '../login/users.dart';
 import '../map/mapScreen.dart';
 import 'package:dio/dio.dart';

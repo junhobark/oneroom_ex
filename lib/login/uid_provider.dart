@@ -5,6 +5,7 @@ class UIDProvider extends ChangeNotifier {
   String nickname;
   String? location;
   String valid;
+
   UIDProvider(
       {required this.uid,
       required this.nickname,

@@ -4,10 +4,10 @@ part 'gradeclass.g.dart';
 
 @JsonSerializable()
 class Grade {
-  final int lessor;
-  final int quality;
-  final int area;
-  final int noise;
+  final double lessor;
+  final double quality;
+  final double area;
+  final double noise;
 
   Grade({
     required this.lessor,

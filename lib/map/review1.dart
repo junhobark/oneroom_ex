@@ -1,17 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:kpostal/kpostal.dart';
 import 'package:oneroom_ex/map/review2.dart';
-
-import '../common/default_layout.dart';
+import 'package:oneroom_ex/map/review_detail/review1_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'mapScreen.dart';
 
-class ReviewScreen1 extends StatelessWidget {
+class ReviewScreen1 extends StatefulWidget {
   const ReviewScreen1({Key? key}) : super(key: key);
 
   @override
+  State<ReviewScreen1> createState() => _ReviewScreen1State();
+}
+
+class _ReviewScreen1State extends State<ReviewScreen1> {
+  final InputController = TextEditingController();
+  var model = null;
+  String roadaddress = '';
+  double kakaoLatitude = 0;
+  double kakaoLongitude = 0;
+  double review_lessor = 0;
+  double review_quality = 0;
+  double review_area = 0;
+  double review_noise = 0;
+  @override
   Widget build(BuildContext context) {
-    return DefaultLayout(
-      title: '리뷰 작성(1/2)',
-      child: SafeArea(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: Text(
+          '리뷰 작성(1/2)',
+          style: TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        foregroundColor: Colors.black,
+        leading: IconButton(
+          onPressed: () {
+            Provider.of<REVIEWProvider>(context, listen: false).setall(
+                review_noise = 0,
+                review_area = 0,
+                review_lessor = 0,
+                review_quality = 0);
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
+      ),
+      body: SafeArea(
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           Container(
               padding: EdgeInsets.all(30),
@@ -25,13 +64,54 @@ class ReviewScreen1 extends StatelessWidget {
                   height: 10,
                 ),
                 Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20), //모서리를 둥글게
-                      border: Border.all(color: Colors.black, width: 2)),
-                  height: 120,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 270,
+                        height: 60,
+                        child: TextField(
+                          enabled: false,
+                          decoration: InputDecoration(
+                            hintText: '주소를 입력해주세요',
+                            labelStyle: TextStyle(color: Colors.black),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(3.0)),
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.black),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(3.0)),
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.black),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(3.0)),
+                            ),
+                          ),
+                          controller: InputController,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          _addressAPI();
+                        },
+                      )
+                    ],
+                  ),
+                  height: 100,
                 ),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
               ])),
           Divider(
@@ -66,6 +146,9 @@ class ReviewScreen1 extends StatelessWidget {
                       color: Colors.amber,
                     ),
                     onRatingUpdate: (rating) {
+                      review_lessor = rating;
+                      Provider.of<REVIEWProvider>(context, listen: false)
+                          .set1(review_lessor);
                       print(rating);
                     },
                   )
@@ -90,6 +173,9 @@ class ReviewScreen1 extends StatelessWidget {
                       color: Colors.amber,
                     ),
                     onRatingUpdate: (rating) {
+                      review_noise = rating;
+                      Provider.of<REVIEWProvider>(context, listen: false)
+                          .set2(review_noise);
                       print(rating);
                     },
                   )
@@ -114,6 +200,9 @@ class ReviewScreen1 extends StatelessWidget {
                       color: Colors.amber,
                     ),
                     onRatingUpdate: (rating) {
+                      review_quality = rating;
+                      Provider.of<REVIEWProvider>(context, listen: false)
+                          .set3(review_quality);
                       print(rating);
                     },
                   )
@@ -138,6 +227,9 @@ class ReviewScreen1 extends StatelessWidget {
                       color: Colors.amber,
                     ),
                     onRatingUpdate: (rating) {
+                      review_area = rating;
+                      Provider.of<REVIEWProvider>(context, listen: false)
+                          .set4(review_area);
                       print(rating);
                     },
                   )
@@ -147,14 +239,31 @@ class ReviewScreen1 extends StatelessWidget {
                 height: 50,
               ),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return const ReviewScreen2();
-                    }),
-                  );
-                },
+                onPressed: roadaddress == '' ||
+                        (Provider.of<REVIEWProvider>(context).review_area) ==
+                            0 ||
+                        (Provider.of<REVIEWProvider>(context).review_lessor) ==
+                            0 ||
+                        (Provider.of<REVIEWProvider>(context).review_noise) ==
+                            0 ||
+                        (Provider.of<REVIEWProvider>(context).review_quality) ==
+                            0
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return ReviewScreen2(
+                                roadaddress,
+                                kakaoLongitude,
+                                kakaoLatitude,
+                                review_area,
+                                review_lessor,
+                                review_noise,
+                                review_quality);
+                          }),
+                        );
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   minimumSize: const Size.fromHeight(50),
@@ -166,5 +275,28 @@ class ReviewScreen1 extends StatelessWidget {
         ]),
       ),
     );
+  }
+
+  _addressAPI() async {
+    model = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KpostalView(
+          useLocalServer: false,
+          localPort: 8080,
+          kakaoKey: kakaoMapKey,
+          callback: (Kpostal result) {
+            setState(() {
+              this.roadaddress = result.roadAddress;
+              this.kakaoLatitude = result.kakaoLatitude!;
+              this.kakaoLongitude = result.kakaoLongitude!;
+            });
+          },
+        ),
+      ),
+    );
+    if (model != null) {
+      InputController.text = '${roadaddress}';
+    }
   }
 }

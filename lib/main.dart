@@ -8,8 +8,10 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/login/loginpage.dart';
 import 'login/loading.dart';
-import 'login/uid.dart';
+import 'login/uid_provider.dart';
 import 'login/users.dart';
+import 'map/review_detail/review1_provider.dart';
+import 'map/review_detail/review2_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,18 @@ void main() async {
     ChangeNotifierProvider(
         create: (_) =>
             UIDProvider(location: '', nickname: '', uid: '', valid: '')),
+    ChangeNotifierProvider(
+        create: (_) => REVIEWProvider(
+            review_area: 0,
+            review_lessor: 0,
+            review_noise: 0,
+            review_quality: 0)),
+    ChangeNotifierProvider(
+        create: (_) => REVIEW2Provider(
+              advantage: '',
+              weakness: '',
+              etc: '',
+            ))
   ], child: _App()));
 }
 
@@ -61,11 +75,12 @@ class _App extends StatelessWidget {
             _uid = user!.uid;
             Provider.of<UIDProvider>(context, listen: false)
                 .setAccessToken(_uid);
-            Future.delayed(Duration(seconds: 2), () {
+            Future.delayed(Duration(seconds: 3), () {
               userfetchData(_uid);
             });
             return Loading();
           }
+
           return const SampleScreen();
         },
       ),

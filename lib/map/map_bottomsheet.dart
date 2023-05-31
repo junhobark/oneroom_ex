@@ -97,7 +97,6 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
               ),
             ],
           ),
-          Text("${widget.location}", style: TextStyle(fontSize: 12)),
           SizedBox(height: 20),
           Divider(
             color: Colors.grey,
@@ -120,6 +119,8 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                         Reviewdetail reviews = snapshot.data![index];
                         Body body = reviews.body;
                         Grade grade = reviews.grade;
+                        List<Map<String, dynamic>> images = reviews.images;
+
                         return Container(
                           child: ListTile(
                             title: Column(
@@ -185,6 +186,28 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      for (var image in images)
+                                        Container(
+                                          padding: EdgeInsets.zero,
+                                          width: 150,
+                                          height: 150,
+                                          child:
+                                              reviews.buildImageWidget(image),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
                                 Text('장점',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,

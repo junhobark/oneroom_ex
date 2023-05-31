@@ -63,8 +63,8 @@ class _mapScreenState extends State<mapScreen> {
   String roadaddress = '';
   String jibunaddress = '';
   String removeaddress = '';
-  String kakaoLatitude = '';
-  String kakaoLongitude = '';
+  double kakaoLatitude = 0;
+  double kakaoLongitude = 0;
   bool draggable = true;
   bool zoomable = true;
 
@@ -214,8 +214,8 @@ class _mapScreenState extends State<mapScreen> {
             setState(() {
               this.roadaddress = result.roadAddress;
               this.jibunaddress = result.jibunAddress;
-              this.kakaoLatitude = result.kakaoLatitude.toString();
-              this.kakaoLongitude = result.kakaoLongitude.toString();
+              this.kakaoLatitude = result.kakaoLatitude!;
+              this.kakaoLongitude = result.kakaoLongitude!;
               removeaddress = roadaddress.replaceFirst('경남 진주시 ', '');
             });
           },
@@ -225,8 +225,8 @@ class _mapScreenState extends State<mapScreen> {
     if (model != null) {
       _AddressController.text = '${roadaddress}';
       selectedPlace = roadaddress;
-      var lat = double.parse(kakaoLatitude);
-      var lng = double.parse(kakaoLongitude);
+      var lat = kakaoLatitude;
+      var lng = kakaoLongitude;
       int cn = 0;
       if (selectedPlace != null) {
         mapController.panTo(LatLng(lat, lng));
@@ -413,7 +413,7 @@ class _mapScreenState extends State<mapScreen> {
                                   Text("${data.location}",
                                       style: TextStyle(fontSize: 12)),
                                   RatingBarIndicator(
-                                    rating: totalgrade() / 4,
+                                    rating: totalgrade() / (4 * totalcount()),
                                     itemBuilder: (context, index) => Icon(
                                       Icons.star,
                                       color: Colors.amber,
@@ -485,31 +485,37 @@ class _mapScreenState extends State<mapScreen> {
   bottom_sheetdata(String location) {
     showModalBottomSheet(
       barrierColor: Colors.white.withOpacity(0.0),
-      isScrollControlled: false,
+      isScrollControlled: true,
       useRootNavigator: true,
       useSafeArea: false,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: Colors.grey, width: 1),
       ),
       context: context,
-      builder: (BuildContext context) => MyBottomSheet(location),
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75, // 원하는 높이로 조절합니다.
+          child: MyBottomSheet(location),
+        );
+      },
     );
   }
 
   bottom_sheet() {
     showModalBottomSheet(
         barrierColor: Colors.white.withOpacity(0.0),
-        isScrollControlled: false,
+        isScrollControlled: true,
         useRootNavigator: true,
         useSafeArea: false,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: Colors.grey, width: 1),
         ),
         context: context,
         builder: (BuildContext context) {
           return Container(
+            height: MediaQuery.of(context).size.height * 0.75,
             padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,7 +567,6 @@ class _mapScreenState extends State<mapScreen> {
                     ),
                   ],
                 ),
-                Text("${jibunaddress}", style: TextStyle(fontSize: 12)),
                 SizedBox(height: 20),
                 Divider(
                   color: Colors.grey,

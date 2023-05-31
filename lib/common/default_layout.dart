@@ -5,12 +5,13 @@ class DefaultLayout extends StatelessWidget {
   final Widget child;
   final String? title; //외부에서 입력받기 위함
   final Widget? bottomNavigationBar;
-
+  final PreferredSizeWidget? appBar;
   const DefaultLayout({
     required this.child,
     this.backgroundColor,
     this.title, //외부에서 입력받기 위함
     this.bottomNavigationBar,
+    this.appBar,
     Key? key,
   }) : super(key: key);
 

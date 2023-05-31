@@ -7,7 +7,7 @@ import 'package:oneroom_ex/Info/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:provider/provider.dart';
 import '../../login/loginpage.dart';
-import '../../login/uid.dart';
+import '../../login/uid_provider.dart';
 
 class informationScreen extends StatefulWidget {
   const informationScreen({Key? key}) : super(key: key);
