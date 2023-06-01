@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +13,7 @@ import 'login/uid_provider.dart';
 import 'login/users.dart';
 import 'map/review_detail/review1_provider.dart';
 import 'map/review_detail/review2_provider.dart';
+import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,11 +60,10 @@ class _App extends StatelessWidget {
             .setdbToken(_data.nickName, _data.location, _data.valid);
       } else {
         print('Error: ${response.statusCode}');
-        throw Exception('Error: ${response.statusCode}');
       }
     }
 
-    return MaterialApp(
+    return GetMaterialApp(
       theme: ThemeData(
         fontFamily: 'NotoSans',
       ),
@@ -75,12 +76,11 @@ class _App extends StatelessWidget {
             _uid = user!.uid;
             Provider.of<UIDProvider>(context, listen: false)
                 .setAccessToken(_uid);
-            Future.delayed(Duration(seconds: 3), () {
+            Future.delayed(Duration(seconds: 2), () {
               userfetchData(_uid);
             });
             return Loading();
           }
-
           return const SampleScreen();
         },
       ),

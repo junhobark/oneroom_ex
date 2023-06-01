@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,8 @@ import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../login/uid_provider.dart';
 import 'map_bottomsheet.dart';
 import 'review_detail/review_class.dart';
 import 'package:intl/intl.dart';
@@ -28,6 +31,50 @@ class _mapScreenState extends State<mapScreen> {
   String jsonData = '';
   List<Mapmarkers> mapmarkers = [];
   List<Reviewdetail> reviews = [];
+  bool isLiked = false;
+  Future<void> favoritePostRequest(String memberId, String location) async {
+    try {
+      var url = Uri.parse('https://10.0.2.2:8080/map/favorite');
+      var headers = {'Content-Type': 'application/json'};
+      var body = jsonEncode({
+        'location': location,
+        'memberId': memberId,
+      });
+
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        // POST 요청이 성공한 경우
+        print('POST 요청 성공!');
+        print('POST 요청 상태 코드: ${response.statusCode}');
+      } else {
+        // POST 요청이 실패한 경우
+        print('POST 요청 실패. 상태 코드: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 네트워크 오류 등 예외 처리
+      print('POST 요청 오류: $e');
+    }
+  }
+
+  Future<void> favoriteDeleteRequest(String location) async {
+    try {
+      Dio dio = Dio();
+      var response =
+          await dio.delete('https://10.0.2.2:8080/map/favorite/${location}');
+
+      if (response.statusCode == 200) {
+        // POST 요청이 성공한 경우
+        print('POST 요청 성공!');
+        print('POST 요청 상태 코드: ${response.statusCode}');
+        // POST 요청이 실패한 경우
+        print('POST 요청 실패. 상태 코드: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 네트워크 오류 등 예외 처리
+      print('POST 요청 오류: $e');
+    }
+  }
 
   Future<List<Mapmarkers>> markerfetchData() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/map/test'));
@@ -48,7 +95,6 @@ class _mapScreenState extends State<mapScreen> {
       print('응답했다2');
       final datadetail =
           jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-
       return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
     } else {
       throw Exception('Error: ${response.statusCode}');
@@ -281,7 +327,16 @@ class _mapScreenState extends State<mapScreen> {
                               Row(
                                 children: [
                                   LikeButton(
-                                    size: 20,
+                                    isLiked: isLiked,
+                                    likeBuilder: (bool isLiked) {
+                                      return Icon(
+                                        Icons.favorite,
+                                        color:
+                                            isLiked ? Colors.red : Colors.grey,
+                                        size: 20,
+                                      );
+                                    },
+                                    onTap: onLikeButtonTapped,
                                   ),
                                   SizedBox(width: 10),
                                   Text(
@@ -386,7 +441,17 @@ class _mapScreenState extends State<mapScreen> {
                                   Row(
                                     children: [
                                       LikeButton(
-                                        size: 20,
+                                        isLiked: isLiked,
+                                        likeBuilder: (bool isLiked) {
+                                          return Icon(
+                                            Icons.favorite,
+                                            color: isLiked
+                                                ? Colors.red
+                                                : Colors.grey,
+                                            size: 20,
+                                          );
+                                        },
+                                        onTap: onLikeButtonTapped,
                                       ),
                                       SizedBox(width: 10),
                                       Text(
@@ -461,6 +526,18 @@ class _mapScreenState extends State<mapScreen> {
     }
   }
 
+  Future<bool> onLikeButtonTapped(bool isLiked) async {
+    if (isLiked) {
+      isLiked = false;
+    } else {
+      favoriteDeleteRequest(roadaddress);
+      isLiked = true;
+    }
+    favoritePostRequest(
+        Provider.of<UIDProvider>(context, listen: false).uid, roadaddress);
+    return Future.value(isLiked);
+  }
+
   int totalcount() {
     int count = 0;
     // ignore: unused_local_variable
@@ -531,7 +608,15 @@ class _mapScreenState extends State<mapScreen> {
                     Row(
                       children: [
                         LikeButton(
-                          size: 20,
+                          isLiked: isLiked,
+                          likeBuilder: (bool isLiked) {
+                            return Icon(
+                              Icons.favorite,
+                              color: isLiked ? Colors.red : Colors.grey,
+                              size: 20,
+                            );
+                          },
+                          onTap: onLikeButtonTapped,
                         ),
                         SizedBox(width: 20),
                         Text(

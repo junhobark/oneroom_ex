@@ -4,12 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:oneroom_ex/map/review_detail/review1_provider.dart';
 import 'package:oneroom_ex/map/review_detail/review2_provider.dart';
 import 'package:provider/provider.dart';
 import '../common/colors.dart';
 import 'package:http_parser/http_parser.dart';
-
-import '../login/uid_provider.dart';
 
 class ReviewScreen2 extends StatefulWidget {
   final String roadaddress;
@@ -95,23 +94,23 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
         print('POST 요청 성공!');
         print('POST 요청 상태 코드: ${response.statusCode}');
         String data = '성공';
+
         return data;
       } else {
         print('POST 요청 실패. 상태 코드: ${response.statusCode}');
         String data = '실패';
+
         return data;
       }
     } catch (e) {
       print('POST 요청 오류: $e');
       String data = '실패';
+
       return data;
     }
   }
 
   Future<void> selectImages() async {
-    if (imageList.isNotEmpty) {
-      imageList.clear();
-    }
     try {
       final List<XFile> selectedImages = await picker.pickMultiImage(
           maxWidth: 640, maxHeight: 280, imageQuality: 100);
@@ -285,11 +284,93 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                               Provider.of<REVIEW2Provider>(context).etc == ''
                           ? null
                           : () async {
-                              CircularProgressIndicator();
-                              // ignore: unused_local_variable
-                              Future<String> data = sendPostRequest();
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                              if (imageList.length > maxImageCount) {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                          content: Text(
+                                            '사진은 최대 5장까지만 가능합니다',
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          actions: [
+                                            Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Container(
+                                                      child: TextButton(
+                                                          child: Text(
+                                                            '확인',
+                                                            style: TextStyle(
+                                                                fontSize: 16.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                          onPressed: () {
+                                                            imageList.clear();
+                                                            Navigator.pop(
+                                                                context);
+                                                          }))
+                                                ])
+                                          ]);
+                                    });
+                              } else {
+                                CircularProgressIndicator();
+
+                                // ignore: unused_local_variable
+                                Future<String> data = sendPostRequest();
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Provider.of<REVIEW2Provider>(context,
+                                        listen: false)
+                                    .setall(advantage = '', weakness = '',
+                                        etc = '');
+                                Provider.of<REVIEWProvider>(context,
+                                        listen: false)
+                                    .setall(0, 0, 0, 0);
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                          content: Text(
+                                            '리뷰가 등록되었습니다!',
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          actions: [
+                                            Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Container(
+                                                      child: TextButton(
+                                                          child: Text(
+                                                            '확인',
+                                                            style: TextStyle(
+                                                                fontSize: 16.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          }))
+                                                ])
+                                          ]);
+                                    });
+                              }
                             },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(50),
@@ -331,22 +412,19 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
         ? Row(
             children: List.generate(imageList.length, (index) {
               return Container(
-                width: 80,
-                height: 80,
-                child: Image.file(File(imageList[index].path)),
+                width: 60,
+                height: 60,
+                child: Image.file(
+                  File(imageList[index].path),
+                  fit: BoxFit.cover,
+                ),
               );
             }),
           )
         : Container(
             child: IconButton(
               onPressed: () {
-                if (imageList.length < maxImageCount) {
-                  selectImages(); // Image selection function
-                } else {
-                  Dialog(
-                    child: Text('사진은 최대5개까지 가능합니다'),
-                  );
-                }
+                selectImages();
               },
               icon: Icon(
                 Icons.photo_library_rounded,

@@ -5,6 +5,7 @@ import 'package:oneroom_ex/map/review2.dart';
 import 'package:oneroom_ex/map/review_detail/review1_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import '../common/colors.dart';
 import 'mapScreen.dart';
 
 class ReviewScreen1 extends StatefulWidget {
@@ -53,7 +54,7 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
       body: SafeArea(
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           Container(
-              padding: EdgeInsets.all(30),
+              padding: EdgeInsets.all(20),
               child: Column(children: [
                 Row(children: [
                   Text("주소",
@@ -61,7 +62,7 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
                           TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
                 ]),
                 SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 Container(
                   child: Row(
@@ -109,9 +110,6 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
                     ],
                   ),
                   height: 100,
-                ),
-                SizedBox(
-                  height: 10,
                 ),
               ])),
           Divider(
@@ -255,8 +253,8 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
                           MaterialPageRoute(builder: (context) {
                             return ReviewScreen2(
                                 roadaddress,
-                                kakaoLongitude,
                                 kakaoLatitude,
+                                kakaoLongitude,
                                 review_area,
                                 review_lessor,
                                 review_noise,
@@ -265,8 +263,9 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
                         );
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
                   minimumSize: const Size.fromHeight(50),
+                  backgroundColor: PRIMARY_COLOR,
+                  foregroundColor: Colors.white,
                 ),
                 child: Text("다음 단계", style: TextStyle(fontSize: 16)),
               ),
