@@ -51,13 +51,13 @@ class _App extends StatelessWidget {
       final response =
           await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
       if (response.statusCode == 200) {
-        print('응답했다3');
         print(utf8.decode(response.bodyBytes));
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         print(Users.fromJson(data));
         var _data = Users.fromJson(data);
         Provider.of<UIDProvider>(context, listen: false)
-            .setdbToken(_data.nickName, _data.location, _data.valid);
+            .setdbfirst(_data.nickName, _data.valid);
+        print('user 가입 정보: ${_data.nickName}, ${_data.valid}');
       } else {
         print('Error: ${response.statusCode}');
       }

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oneroom_ex/Info/info_certification.dart';
 import 'package:oneroom_ex/Info/info_written_board.dart';
 import 'package:oneroom_ex/Info/info_written_comment.dart';
-import 'package:oneroom_ex/Info/info_written_review.dart';
+import 'package:oneroom_ex/Info/info_review/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:provider/provider.dart';
 import '../../login/loginpage.dart';
@@ -300,12 +300,20 @@ class _informationScreen extends State<informationScreen> {
               SizedBox(height: 20),
 
               _logoutButton(),
-              SizedBox(height: 4),
-              Text(
-                '문의메일: gnuroom9@naver.com',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.0,
+
+              Container(
+                padding: EdgeInsets.all(15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'go amin',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

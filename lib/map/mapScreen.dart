@@ -16,6 +16,7 @@ import 'map_bottomsheet.dart';
 import 'review_detail/review_class.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:http_parser/http_parser.dart';
 
 const String kakaoMapKey = '06fa866ad2a59ae0dfba2b8c9d47a578';
 
@@ -32,16 +33,28 @@ class _mapScreenState extends State<mapScreen> {
   List<Mapmarkers> mapmarkers = [];
   List<Reviewdetail> reviews = [];
   bool isLiked = false;
-  Future<void> favoritePostRequest(String memberId, String location) async {
-    try {
-      var url = Uri.parse('https://10.0.2.2:8080/map/favorite');
-      var headers = {'Content-Type': 'application/json'};
-      var body = jsonEncode({
-        'location': location,
-        'memberId': memberId,
-      });
 
-      var response = await http.post(url, headers: headers, body: body);
+  Future<void> favoritePostRequest(String memberId, String location) async {
+    final dio = Dio();
+    var url = 'https://10.0.2.2:8080/map/favorite';
+    var body = {
+      'location': location,
+      'memberId': memberId,
+    };
+    FormData formData = FormData.fromMap({
+      'createReviewDto': MultipartFile.fromString(
+        jsonEncode(body),
+        contentType: MediaType('application', 'json'),
+      ),
+    });
+    try {
+      Response response = await dio.post(
+        url,
+        data: formData,
+        options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+        ),
+      );
 
       if (response.statusCode == 200) {
         // POST 요청이 성공한 경우
@@ -58,15 +71,16 @@ class _mapScreenState extends State<mapScreen> {
   }
 
   Future<void> favoriteDeleteRequest(String location) async {
+    final dio = Dio();
+    var url = 'http://10.0.2.2:8080/map/favorite/${location}';
     try {
-      Dio dio = Dio();
-      var response =
-          await dio.delete('https://10.0.2.2:8080/map/favorite/${location}');
+      var response = await dio.delete(url);
 
       if (response.statusCode == 200) {
         // POST 요청이 성공한 경우
         print('POST 요청 성공!');
         print('POST 요청 상태 코드: ${response.statusCode}');
+      } else {
         // POST 요청이 실패한 경우
         print('POST 요청 실패. 상태 코드: ${response.statusCode}');
       }

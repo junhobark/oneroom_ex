@@ -22,4 +22,10 @@ class UIDProvider extends ChangeNotifier {
     this.valid = valid;
     notifyListeners();
   }
+
+  void setdbfirst(String nickname, String valid) {
+    this.nickname = nickname;
+    this.valid = valid;
+    notifyListeners();
+  }
 }

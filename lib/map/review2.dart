@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import '../common/colors.dart';
 import 'package:http_parser/http_parser.dart';
 
+import '../login/uid_provider.dart';
+
 class ReviewScreen2 extends StatefulWidget {
   final String roadaddress;
   final double review_lat;
@@ -45,7 +47,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
     var url = 'http://10.0.2.2:8080/map/${widget.roadaddress}/review/write';
 
     Map<String, dynamic> createReviewDto = {
-      'memberId': 'abc',
+      'memberId': Provider.of<UIDProvider>(context, listen: false).uid,
       'location': widget.roadaddress,
       'grade': {
         'lessor': widget.review_lessor,
@@ -70,16 +72,17 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
         contentType: MediaType('application', 'json'),
       ),
     });
-
-    for (File imageFile in imageList) {
-      String fileName = imageFile.path.split('/').last;
-      formData.files.add(MapEntry(
-        'files',
-        await MultipartFile.fromFile(
-          imageFile.path,
-          filename: fileName,
-        ),
-      ));
+    if (imageList.isNotEmpty) {
+      for (File imageFile in imageList) {
+        String fileName = imageFile.path.split('/').last;
+        formData.files.add(MapEntry(
+          'files',
+          await MultipartFile.fromFile(
+            imageFile.path,
+            filename: fileName,
+          ),
+        ));
+      }
     }
 
     try {

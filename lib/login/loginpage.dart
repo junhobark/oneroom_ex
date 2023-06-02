@@ -5,6 +5,8 @@ import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:oneroom_ex/login/uid_provider.dart';
+import 'package:provider/provider.dart';
 
 class SampleScreen extends StatefulWidget {
   const SampleScreen({Key? key}) : super(key: key);
@@ -37,7 +39,7 @@ class _SampleScreenState extends State<SampleScreen> {
       var response = await http.post(url,
           headers: {"Content-Type": "application/json"}, body: body);
       if (response.statusCode == 200) {
-        // POST 요청이 성공한 경우
+        Provider.of<UIDProvider>(context, listen: false).setAccessToken(uuid);
         print('POST 요청 성공!');
         print('POST 요청 상태 코드: ${response.statusCode}');
         print('오류 응답 본문: ${response.body}');

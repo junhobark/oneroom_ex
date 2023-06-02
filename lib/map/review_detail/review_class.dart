@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 import 'bodyclass.dart';
 import 'gradeclass.dart';
 part 'review_class.g.dart';
@@ -17,6 +15,7 @@ class Reviewdetail {
   final Grade grade;
   final String location;
   final List<Map<String, dynamic>> images;
+
   Reviewdetail({
     required this.createdAt,
     required this.modifiedAt,

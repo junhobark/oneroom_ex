@@ -60,6 +60,8 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
         print('POST 요청 성공!delete');
         print('POST 요청 상태 코드: ${response.statusCode}');
         // POST 요청이 실패한 경우
+      } else {
+        // POST 요청이 실패한 경우
         print('POST 요청 실패. 상태 코드: ${response.statusCode}');
       }
     } catch (e) {
@@ -190,7 +192,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                                       width: 5,
                                     ),
                                     Text(
-                                      "익명${reviews.id}",
+                                      "익명",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
