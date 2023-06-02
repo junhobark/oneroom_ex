@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:oneroom_ex/Info/info_certification.dart';
 import 'package:oneroom_ex/Info/info_written_board.dart';
 import 'package:oneroom_ex/Info/info_written_comment.dart';
 import 'package:oneroom_ex/Info/info_review/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:provider/provider.dart';
-import '../../login/loginpage.dart';
 import '../../login/uid_provider.dart';
+import '../_admin/adminlist.dart';
 
 class informationScreen extends StatefulWidget {
   const informationScreen({Key? key}) : super(key: key);
@@ -58,16 +59,9 @@ class _informationScreen extends State<informationScreen> {
           ),
         ),
         onPressed: () {
+          _signOut();
           _authentication.signOut();
           Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return SampleScreen();
-              },
-            ),
-          );
         },
         child: Text('로그아웃'),
       ),
@@ -306,11 +300,20 @@ class _informationScreen extends State<informationScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'go amin',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12.0,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => Adminlist(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'go amin',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
                       ),
                     ),
                   ],
@@ -321,5 +324,9 @@ class _informationScreen extends State<informationScreen> {
         ),
       ),
     );
+  }
+
+  void _signOut() async {
+    await FlutterNaverLogin.logOut();
   }
 }
