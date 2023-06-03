@@ -9,8 +9,10 @@ import 'package:oneroom_ex/map/review_detail/review2_provider.dart';
 import 'package:provider/provider.dart';
 import '../common/colors.dart';
 import 'package:http_parser/http_parser.dart';
-
+import 'package:http/http.dart' as http;
 import '../login/uid_provider.dart';
+import '../login/users.dart';
+import 'locationProvider.dart';
 
 class ReviewScreen2 extends StatefulWidget {
   final String roadaddress;
@@ -41,6 +43,25 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
   String etc = '';
   List<File> imageList = [];
   final ImagePicker picker = ImagePicker();
+  late final Function onMapCreated;
+
+  Future<String> userfetchData(uid) async {
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
+    if (response.statusCode == 200) {
+      print('응답했다3');
+      print(utf8.decode(response.bodyBytes));
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      print(Users.fromJson(data));
+      var _data = Users.fromJson(data);
+      Provider.of<UIDProvider>(context, listen: false)
+          .setdbToken(_data.nickName, _data.location, _data.valid);
+      return _data.valid;
+    } else {
+      print('Error: ${response.statusCode}');
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
 
   Future<String> sendPostRequest() async {
     final dio = Dio();
@@ -326,9 +347,20 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                     });
                               } else {
                                 CircularProgressIndicator();
-
                                 // ignore: unused_local_variable
-                                Future<String> data = sendPostRequest();
+                                String data = await sendPostRequest();
+                                String result = await userfetchData(
+                                    Provider.of<UIDProvider>(context,
+                                            listen: false)
+                                        .uid);
+                                print(widget.review_lat);
+                                Provider.of<LocationProvider>(context,
+                                        listen: false)
+                                    .setlocation(
+                                        widget.review_lat,
+                                        widget.review_lng,
+                                        widget.roadaddress,
+                                        1);
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                                 Provider.of<REVIEW2Provider>(context,
@@ -343,7 +375,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                           content: Text(
-                                            '리뷰가 등록되었습니다!',
+                                            '이제 커뮤니티 이용이 가능합니다!',
                                             style: TextStyle(
                                               fontSize: 22,
                                               fontWeight: FontWeight.w700,

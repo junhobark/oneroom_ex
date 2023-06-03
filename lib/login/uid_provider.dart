@@ -28,4 +28,8 @@ class UIDProvider extends ChangeNotifier {
     this.valid = valid;
     notifyListeners();
   }
+  void setlocation(String location) {
+    this.location = location;
+    notifyListeners();
+  }
 }

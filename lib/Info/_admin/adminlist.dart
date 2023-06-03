@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:oneroom_ex/Info/_admin/adminrequest.dart';
 import '../../common/default_layout.dart';
 import 'admin_infoclass.dart';
 
@@ -13,6 +14,7 @@ class Adminlist extends StatefulWidget {
 }
 
 class _AdminlistState extends State<Adminlist> {
+
   Future<List<Admininfo>?> admininfofetchData() async {
     try {
       final response = await http.get(Uri.parse('http://10.0.2.2:8080/admin'));
@@ -50,9 +52,18 @@ class _AdminlistState extends State<Adminlist> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             Admininfo admin = snapshot.data![index];
-
                             return ListTile(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            Adminrequest(admin.id)))
+                                    .then((value) {
+                                  setState(() {
+                                    admininfofetchData();
+                                  });
+                                });
+                              },
                               title: Container(
                                 padding: EdgeInsets.only(
                                     top: 10, bottom: 10, left: 20, right: 20),

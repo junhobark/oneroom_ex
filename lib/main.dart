@@ -11,6 +11,7 @@ import 'package:oneroom_ex/login/loginpage.dart';
 import 'login/loading.dart';
 import 'login/uid_provider.dart';
 import 'login/users.dart';
+import 'map/locationProvider.dart';
 import 'map/review_detail/review1_provider.dart';
 import 'map/review_detail/review2_provider.dart';
 import 'package:get/get.dart';
@@ -26,6 +27,8 @@ void main() async {
     ChangeNotifierProvider(
         create: (_) =>
             UIDProvider(location: '', nickname: '', uid: '', valid: '')),
+    ChangeNotifierProvider(
+        create: (_) => LocationProvider(lat: 0, lng: 0, loca: '', cnt: 0)),
     ChangeNotifierProvider(
         create: (_) => REVIEWProvider(
             review_area: 0,
@@ -55,8 +58,11 @@ class _App extends StatelessWidget {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         print(Users.fromJson(data));
         var _data = Users.fromJson(data);
-        Provider.of<UIDProvider>(context, listen: false)
-            .setdbfirst(_data.nickName, _data.valid);
+        Provider.of<UIDProvider>(context, listen: false).setdbToken(
+          _data.nickName,
+          _data.location,
+          _data.valid,
+        );
         print('user 가입 정보: ${_data.nickName}, ${_data.valid}');
       } else {
         print('Error: ${response.statusCode}');

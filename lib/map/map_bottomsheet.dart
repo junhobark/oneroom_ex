@@ -72,7 +72,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
 
   Future<List<Reviewdetail>> reviewfetchData() async {
     final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/map/${widget.location}/detail'));
+        .get(Uri.parse('http://10.0.2.2:8080/map/${widget.location}/review'));
     if (response.statusCode == 200) {
       print('응답했다2');
       final datadetail =

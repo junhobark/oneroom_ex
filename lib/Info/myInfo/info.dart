@@ -110,7 +110,7 @@ class _informationScreen extends State<informationScreen> {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: '내 거주지',
                               style: TextStyle(
                                 fontSize: 16.0,
@@ -129,8 +129,11 @@ class _informationScreen extends State<informationScreen> {
                                 ),
                               ),
                             if (Provider.of<UIDProvider>(context, listen: false)
-                                    .valid ==
-                                "ONGOING")
+                                        .valid ==
+                                    "ONGOING" &&
+                                Provider.of<UIDProvider>(context, listen: false)
+                                        .location ==
+                                    null)
                               TextSpan(
                                 text: '\n인증중입니다(기다려주세요)',
                                 style: TextStyle(
@@ -140,8 +143,11 @@ class _informationScreen extends State<informationScreen> {
                                 ),
                               ),
                             if (Provider.of<UIDProvider>(context, listen: false)
-                                    .valid ==
-                                "CERTIFIED")
+                                        .valid ==
+                                    "ONGOING" &&
+                                Provider.of<UIDProvider>(context, listen: false)
+                                        .location !=
+                                    null)
                               TextSpan(
                                 text:
                                     '\n${Provider.of<UIDProvider>(context).location}',
@@ -151,6 +157,27 @@ class _informationScreen extends State<informationScreen> {
                                   color: Colors.black,
                                 ),
                               ),
+                            if (Provider.of<UIDProvider>(context, listen: false)
+                                        .valid ==
+                                    "CERTIFIED" &&
+                                Provider.of<UIDProvider>(context, listen: false)
+                                        .location !=
+                                    null)
+                             TextSpan( children:[TextSpan(
+                                text:
+                                    '\n${Provider.of<UIDProvider>(context).location}  ',
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black,
+                                ),
+                              ), WidgetSpan(
+                              child: Icon(
+                                Icons.check_box,
+                                size: 22.0,
+                                color: Colors.black,
+                              ),
+                            ),]),
                           ],
                         ),
                       ),
@@ -180,7 +207,18 @@ class _informationScreen extends State<informationScreen> {
                                 ),
                               );
                             }
-                          : null,
+                          : (Provider.of<UIDProvider>(context, listen: false)
+                                      .valid ==
+                                  "CERTIFIED")
+                              ? () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          CertificationScreen(),
+                                    ),
+                                  );
+                                }
+                              : null,
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -196,7 +234,11 @@ class _informationScreen extends State<informationScreen> {
                     ),
                     foregroundColor: Colors.black,
                   ),
-                  child: Text('거주지 인증'),
+                  child:
+                      (Provider.of<UIDProvider>(context, listen: false).valid ==
+                              "CERTIFIED")
+                          ? Text('거주지 인증 갱신')
+                          : Text('거주지 인증'),
                 ),
               ),
               SizedBox(height: 20),
@@ -306,7 +348,11 @@ class _informationScreen extends State<informationScreen> {
                           MaterialPageRoute(
                             builder: (BuildContext context) => Adminlist(),
                           ),
-                        );
+                        ).then((value){
+                          setState(() {
+
+                          });
+                        });
                       },
                       child: Text(
                         'go amin',

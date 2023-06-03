@@ -12,6 +12,7 @@ import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
+import 'locationProvider.dart';
 import 'map_bottomsheet.dart';
 import 'review_detail/review_class.dart';
 import 'package:intl/intl.dart';
@@ -36,7 +37,7 @@ class _mapScreenState extends State<mapScreen> {
 
   Future<void> favoritePostRequest(String memberId, String location) async {
     final dio = Dio();
-    var url = 'https://10.0.2.2:8080/map/favorite';
+    var url = 'http://10.0.2.2:8080/map/favorite';
     var body = {
       'location': location,
       'memberId': memberId,
@@ -104,7 +105,7 @@ class _mapScreenState extends State<mapScreen> {
 
   Future<List<Reviewdetail>> reviewfetchData(location) async {
     final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/detail'));
+        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/review'));
     if (response.statusCode == 200) {
       print('응답했다2');
       final datadetail =
@@ -249,7 +250,38 @@ class _mapScreenState extends State<mapScreen> {
                       MaterialPageRoute(builder: (context) {
                         return const ReviewScreen1();
                       }),
-                    );
+                    ).then((value) {
+                      if (Provider.of<LocationProvider>(context, listen: false)
+                              .cnt ==
+                          1) {
+                        setState(() {
+                          markerfetchData().then((data) {
+                            setState(() {
+                              mapmarkers = data;
+                            });
+                          });
+                          mapController.panTo(LatLng(
+                              Provider.of<LocationProvider>(context,
+                                      listen: false)
+                                  .lat,
+                              Provider.of<LocationProvider>(context,
+                                      listen: false)
+                                  .lng));
+                          for (var data in mapmarkers) {
+                            if (data.location ==
+                                Provider.of<LocationProvider>(context,
+                                        listen: false)
+                                    .loca) {
+                              map_showDialog(data.id.toString());
+                              break;
+                            }
+                          }
+                          ;
+                        });
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .setlocation(0, 0, '', 1);
+                      }
+                    });
                   },
                   icon: const Icon(
                     Icons.rate_review,
