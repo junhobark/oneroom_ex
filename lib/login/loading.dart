@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/root_tab.dart';
+import 'package:oneroom_ex/map/pos_provideer.dart';
+import 'package:provider/provider.dart';
 
 import 'my_location.dart';
 
@@ -23,8 +25,14 @@ class _LoadingState extends State<Loading> {
     longitude3 = myLocation.longitude2;
     print(latitude3);
     print(longitude3);
+    Provider.of<POSProvider>(context, listen: false)
+        .setpos(latitude3, longitude3);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return RootTab(latitude: latitude3, longitude: longitude3);
+      return RootTab(
+        latitude: latitude3,
+        longitude: longitude3,
+        location: '',
+      );
     }));
   }
 

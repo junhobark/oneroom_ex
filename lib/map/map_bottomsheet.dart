@@ -8,65 +8,122 @@ import 'package:like_button/like_button.dart';
 import 'package:oneroom_ex/map/review_detail/review_class.dart';
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
+import 'favorite/favoriteclass.dart';
+import 'like_provider.dart';
 import 'review_detail/bodyclass.dart';
 import 'review_detail/gradeclass.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class MyBottomSheet extends StatefulWidget {
   final String location;
+  final double lat;
+  final double lng;
 
-  MyBottomSheet(this.location);
+  MyBottomSheet(this.location, this.lat, this.lng);
 
   @override
   _MyBottomSheetState createState() => _MyBottomSheetState();
 }
 
-class _MyBottomSheetState extends State<MyBottomSheet> {
+class _MyBottomSheetState extends State<MyBottomSheet>
+    with WidgetsBindingObserver {
   List<Reviewdetail> reviews = [];
+  List<Favorite> favorite = [];
   bool isLiked = false;
-  void favoritePostRequest(String memberId, String location) async {
-    try {
-      var url = Uri.parse('https://10.0.2.2:8080/map/favorite');
-      var headers = {'Content-Type': 'application/json'};
-      var body = jsonEncode({
-        'location': location,
-        'memberId': memberId,
-      });
 
-      var response = await http.post(url, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        // POST 요청이 성공한 경우
-        print('POST 요청 성공!favorite');
-        print('POST 요청 상태 코드: ${response.statusCode}');
-      } else {
-        // POST 요청이 실패한 경우
-        print('POST 요청 실패. 상태 코드: ${response.statusCode}');
-      }
-    } catch (e) {
-      // 네트워크 오류 등 예외 처리
-      print('POST 요청 오류: $e');
+  Future<List<Favorite>> favoritefetchData() async {
+    String uid = Provider.of<UIDProvider>(context, listen: false).uid;
+    print(uid);
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}/favorite'));
+    if (response.statusCode == 200) {
+      print('응답했다!');
+      final datadetail =
+          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+      print(datadetail.map((item) => Favorite.fromJson(item)).toList());
+      return datadetail.map((item) => Favorite.fromJson(item)).toList();
+    } else {
+      print('An error occurred: e');
+      throw Exception('An error occurred:');
     }
   }
 
-  void favoriteDeleteRequest(String location) async {
-    try {
-      Dio dio = Dio();
-      var response =
-          await dio.delete('https://10.0.2.2:8080/map/favorite/${location}');
+  Future<String?> favoritePostRequest(
+      String uid, String location, double lat, double lng) async {
+    final dio = Dio();
 
-      if (response.statusCode == 200) {
-        // POST 요청이 성공한 경우
-        print('POST 요청 성공!delete');
-        print('POST 요청 상태 코드: ${response.statusCode}');
-        // POST 요청이 실패한 경우
-      } else {
-        // POST 요청이 실패한 경우
-        print('POST 요청 실패. 상태 코드: ${response.statusCode}');
-      }
-    } catch (e) {
-      // 네트워크 오류 등 예외 처리
-      print('POST 요청 오류: $e');
+    Map<String, dynamic> favoriteDto = {
+      'location': location,
+      'memberId': uid,
+      'posx': lat,
+      'posy': lng
+    };
+    print(location);
+    print(uid);
+    String jsonString = jsonEncode(favoriteDto);
+
+    FormData formData = FormData.fromMap({
+      'favoriteDto': MultipartFile.fromString(
+        jsonString,
+        contentType: MediaType('application', 'json'),
+      )
+    });
+
+    Response response = await dio.post(
+      'http://10.0.2.2:8080/map/favorite',
+      data: formData,
+      options: Options(
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      print('요청성공!,');
+      String result = '성공';
+      return result;
+    } else {
+      print('${response.statusCode}');
+      return null;
+    }
+  }
+
+  Future<String> favoriteDeleteRequest(String uid, String location) async {
+    final dio = Dio();
+
+    Map<String, dynamic> favoriteDto = {
+      'location': location,
+      'memberId': uid,
+    };
+    print(location);
+    print(uid);
+    String jsonString = jsonEncode(favoriteDto);
+
+    FormData formData = FormData.fromMap({
+      'favoriteDto': MultipartFile.fromString(
+        jsonString,
+        contentType: MediaType('application', 'json'),
+      )
+    });
+
+    Response response = await dio.delete(
+      'http://10.0.2.2:8080/map/favorite',
+      data: formData,
+      options: Options(
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      print('요청성공!,');
+      String result = '성공';
+      return result;
+    } else {
+      print('${response.statusCode}');
+      String result = '';
+      return result;
     }
   }
 
@@ -92,10 +149,46 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
         reviews = data;
       });
     });
+    favoritefetchData().then((data) {
+      setState(() {
+        favorite = data;
+      });
+    });
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // 앱이 다시 활성화될 때 실행될 코드
+      setState(() {
+        // 상태 변경
+      });
+    }
+  }
+
+  void someFunction() {
+    // 함수 실행 후 setState를 실행하려면
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        favoritefetchData().then((data) {
+          setState(() {
+            favorite = data;
+          });
+        });
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    islike(widget.location);
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -111,16 +204,23 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
               Row(
                 children: [
                   LikeButton(
-                    isLiked: isLiked,
-                    likeBuilder: (bool isLiked) {
-                      return Icon(
-                        Icons.favorite,
-                        color: isLiked ? Colors.red : Colors.grey,
-                        size: 20,
-                      );
-                    },
-                    onTap: onLikeButtonTapped,
-                  ),
+                      isLiked:
+                          Provider.of<LikeProvider>(context).isLiked == true
+                              ? true
+                              : false,
+                      likeBuilder: (bool isLiked) {
+                        return Icon(
+                          Icons.favorite,
+                          color: isLiked ? Colors.red : Colors.grey,
+                          size: 20,
+                        );
+                      },
+                      onTap: (isLiked) => onLikeButtonTapped(
+                          Provider.of<LikeProvider>(context, listen: false)
+                              .isLiked,
+                          widget.location,
+                          widget.lat,
+                          widget.lng)),
                   SizedBox(width: 20),
                   Text(
                     '${NumberFormat("#.#").format(totalgrade() / (4 * totalcount()))}',
@@ -357,15 +457,40 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
     return grade;
   }
 
-  Future<bool> onLikeButtonTapped(bool isLiked) async {
+  Future<bool> onLikeButtonTapped(
+      bool isLiked, String location, double lat, double lng) async {
     if (isLiked) {
-      this.isLiked = false;
+      // 좋아요 취소를 위해 DELETE 요청 보내기
+      favoriteDeleteRequest(
+          Provider.of<UIDProvider>(context, listen: false).uid, location);
     } else {
-      favoriteDeleteRequest(widget.location);
-      this.isLiked = true;
+      // 좋아요 추가를 위해 POST 요청 보내기
+      favoritePostRequest(Provider.of<UIDProvider>(context, listen: false).uid,
+          location, lat, lng);
     }
-    favoritePostRequest(
-        Provider.of<UIDProvider>(context, listen: false).uid, widget.location);
-    return Future.value(this.isLiked);
+
+    setState(() {
+      favoritefetchData().then((data) {
+        setState(() {
+          favorite = data;
+        });
+      });
+    });
+
+    // isLiked 값 반전시키기
+    isLiked = !isLiked;
+    Provider.of<LikeProvider>(context, listen: false).toggleLike();
+    return isLiked;
+  }
+
+  bool islike(String location) {
+    Provider.of<LikeProvider>(context, listen: false).Likefalse();
+    for (var data in favorite) {
+      if (data.location == location) {
+        Provider.of<LikeProvider>(context, listen: false).Liketrue();
+        break;
+      }
+    }
+    return Provider.of<LikeProvider>(context, listen: false).isLiked;
   }
 }

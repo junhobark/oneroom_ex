@@ -43,7 +43,6 @@ class _WrittenReviewScreenState extends State<WrittenReviewScreen> {
         print('응답했다2');
         final datadetail =
             jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-
         return datadetail.map((item) => Reviewinfo.fromJson(item)).toList();
       } else {
         print('An error occurred: e');
@@ -236,9 +235,17 @@ class _WrittenReviewScreenState extends State<WrittenReviewScreen> {
                                           width: 10,
                                         ),
                                         TextButton(
-                                          onPressed: () {
-                                            myreviewDeleteRequest(
+                                          onPressed: () async {
+                                            await myreviewDeleteRequest(
                                                 reviews.location, reviews.id);
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        WrittenReviewScreen(),
+                                              ),
+                                            );
                                           },
                                           child: Text(
                                             '삭제',

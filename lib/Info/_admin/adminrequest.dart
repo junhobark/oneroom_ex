@@ -20,7 +20,7 @@ class Adminrequest extends StatefulWidget {
 class _AdminrequestState extends State<Adminrequest> {
   Future<String> userfetchData(uid) async {
     final response =
-    await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
+        await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
     if (response.statusCode == 200) {
       print('응답했다3');
       print(utf8.decode(response.bodyBytes));
@@ -35,6 +35,7 @@ class _AdminrequestState extends State<Adminrequest> {
       throw Exception('Error: ${response.statusCode}');
     }
   }
+
   Future<Admin> adminfetchData(id) async {
     final response = await http
         .get(Uri.parse('http://10.0.2.2:8080/admin/locRequest/${id}'));
@@ -53,11 +54,11 @@ class _AdminrequestState extends State<Adminrequest> {
         .post(Uri.parse('http://10.0.2.2:8080/admin/locRequest/${id}'));
     if (response.statusCode == 200) {
       print('요청성공!,인증이 성공하였습니다');
-      String result ='성공';
+      String result = '성공';
       return result;
     } else {
       print('${response.statusCode}');
-      String result ='';
+      String result = '';
       return result;
     }
   }
@@ -67,11 +68,11 @@ class _AdminrequestState extends State<Adminrequest> {
         .delete(Uri.parse('http://10.0.2.2:8080/admin/locRequest/${id}'));
     if (response.statusCode == 200) {
       print('요청성공!,삭제되었습니다');
-      String result ='성공';
+      String result = '성공';
       return result;
     } else {
       print('${response.statusCode}');
-      String result ='';
+      String result = '';
       return result;
     }
   }
@@ -137,10 +138,15 @@ class _AdminrequestState extends State<Adminrequest> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               TextButton(
-                                onPressed: () async{
-                                  String result =  await postadminfetchData(admin.id);
-                                  String data = await userfetchData(  Provider.of<UIDProvider>(context, listen: false)
-                                      .uid);
+                                onPressed: () async {
+                                  // ignore: unused_local_variable
+                                  String result =
+                                      await postadminfetchData(admin.id);
+                                  // ignore: unused_local_variable
+                                  String data = await userfetchData(
+                                      Provider.of<UIDProvider>(context,
+                                              listen: false)
+                                          .uid);
                                   Navigator.pop(context);
                                 },
                                 child: Text(
@@ -163,10 +169,15 @@ class _AdminrequestState extends State<Adminrequest> {
                                 width: 10,
                               ),
                               TextButton(
-                                onPressed: () async{
-                                  String result =  await deleteadminfetchData(admin.id);
-                                  String data = await userfetchData(  Provider.of<UIDProvider>(context, listen: false)
-                                      .uid);
+                                onPressed: () async {
+                                  // ignore: unused_local_variable
+                                  String result =
+                                      await deleteadminfetchData(admin.id);
+                                  // ignore: unused_local_variable
+                                  String data = await userfetchData(
+                                      Provider.of<UIDProvider>(context,
+                                              listen: false)
+                                          .uid);
                                   Navigator.pop(context);
                                 },
                                 child: Text(

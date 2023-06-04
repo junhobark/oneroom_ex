@@ -5,6 +5,7 @@ class LocationProvider extends ChangeNotifier {
   double lng;
   String loca;
   int cnt;
+
   LocationProvider(
       {required this.lat,
       required this.lng,

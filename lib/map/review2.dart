@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../common/colors.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
+import '../common/root_tab.dart';
 import '../login/uid_provider.dart';
 import '../login/users.dart';
 import 'locationProvider.dart';
@@ -349,6 +350,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                 CircularProgressIndicator();
                                 // ignore: unused_local_variable
                                 String data = await sendPostRequest();
+                                // ignore: unused_local_variable
                                 String result = await userfetchData(
                                     Provider.of<UIDProvider>(context,
                                             listen: false)
@@ -363,6 +365,15 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                         1);
                                 Navigator.pop(context);
                                 Navigator.pop(context);
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RootTab(
+                                        latitude: widget.review_lat,
+                                        longitude: widget.review_lng,
+                                        location: widget.roadaddress,
+                                      ),
+                                    ));
                                 Provider.of<REVIEW2Provider>(context,
                                         listen: false)
                                     .setall(advantage = '', weakness = '',
@@ -370,41 +381,41 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                 Provider.of<REVIEWProvider>(context,
                                         listen: false)
                                     .setall(0, 0, 0, 0);
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                          content: Text(
-                                            '이제 커뮤니티 이용이 가능합니다!',
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          actions: [
-                                            Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  Container(
-                                                      child: TextButton(
-                                                          child: Text(
-                                                            '확인',
-                                                            style: TextStyle(
-                                                                fontSize: 16.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                color: Colors
-                                                                    .black),
-                                                          ),
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          }))
-                                                ])
-                                          ]);
-                                    });
+                                // showDialog(
+                                //     context: context,
+                                //     builder: (BuildContext context) {
+                                //       return AlertDialog(
+                                //           content: Text(
+                                //             '이제 커뮤니티 이용이 가능합니다!',
+                                //             style: TextStyle(
+                                //               fontSize: 22,
+                                //               fontWeight: FontWeight.w700,
+                                //             ),
+                                //           ),
+                                //           actions: [
+                                //             Row(
+                                //                 mainAxisAlignment:
+                                //                     MainAxisAlignment.end,
+                                //                 children: [
+                                //                   Container(
+                                //                       child: TextButton(
+                                //                           child: Text(
+                                //                             '확인',
+                                //                             style: TextStyle(
+                                //                                 fontSize: 16.0,
+                                //                                 fontWeight:
+                                //                                     FontWeight
+                                //                                         .w700,
+                                //                                 color: Colors
+                                //                                     .black),
+                                //                           ),
+                                //                           onPressed: () {
+                                //                             Navigator.pop(
+                                //                                 context);
+                                //                           }))
+                                //                 ])
+                                //           ]);
+                                //     });
                               }
                             },
                       style: ElevatedButton.styleFrom(

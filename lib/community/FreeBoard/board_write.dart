@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/community/custom_text_field.dart';
-import 'package:oneroom_ex/community/FreeBoard/freeboard.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -65,13 +64,7 @@ class _BoardWriteState extends State<BoardWrite> {
               _buildPhotoArea(),
               SizedBox(height: 20.0),
               ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => FreeBoardScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: PRIMARY_COLOR,
                     foregroundColor: Colors.white,

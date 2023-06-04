@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
-import 'package:oneroom_ex/community/communityScreen_Search.dart';
-import 'package:oneroom_ex/community/FreeBoard/freeboard.dart';
-import 'package:oneroom_ex/community/tipboard.dart';
 
 import 'marketboard.dart';
 
@@ -25,14 +22,7 @@ class communityScreen extends StatelessWidget {
                 height: 70,
               ),
               OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          CommunitySearchScreen(),
-                    ),
-                  );
-                },
+                onPressed: () {},
                 child: Text('search'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: BODY_TEXT_COLOR,
@@ -57,13 +47,7 @@ class communityScreen extends StatelessWidget {
                   color: Colors.black,
                 ))),
                 child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => FreeBoardScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   icon: Icon(Icons.chat_bubble_outline),
                   label:
                       Text('자유게시판                                       더보기>'),
@@ -83,13 +67,7 @@ class communityScreen extends StatelessWidget {
                   color: Colors.black,
                 ))),
                 child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => TipBoardScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   icon: Icon(Icons.chat_bubble_outline),
                   label: Text(
                       '자취 꿀팁                                          더보기>'),
