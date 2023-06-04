@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
 import 'package:oneroom_ex/map/favorite/favorite.dart';
-import 'package:oneroom_ex/Info/myInfo/info.dart';
+import 'package:oneroom_ex/Info/info.dart';
 import 'package:oneroom_ex/map/mapScreen.dart';
 import 'package:oneroom_ex/map/pos_provideer.dart';
 import 'package:provider/provider.dart';

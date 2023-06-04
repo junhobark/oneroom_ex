@@ -353,7 +353,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
                                     children: [
                                       for (var image in images)
                                         Container(
-                                          padding: EdgeInsets.zero,
+                                          padding: EdgeInsets.all(1),
                                           width: 150,
                                           height: 150,
                                           child:

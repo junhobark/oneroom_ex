@@ -7,69 +7,38 @@ import 'package:image_picker/image_picker.dart';
 import 'package:oneroom_ex/map/review_detail/review1_provider.dart';
 import 'package:oneroom_ex/map/review_detail/review2_provider.dart';
 import 'package:provider/provider.dart';
-import '../common/colors.dart';
+import '../../../common/colors.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
-import '../common/root_tab.dart';
-import '../login/uid_provider.dart';
-import '../login/users.dart';
-import 'locationProvider.dart';
+import '../../../map/review_detail/review_class.dart';
+import '../info_written_review.dart';
 
-class ReviewScreen2 extends StatefulWidget {
-  final String roadaddress;
-  final double review_lat;
-  final double review_lng;
+class Reviewmodify2 extends StatefulWidget {
+  final String location;
+  final int reviewid;
   final double review_area;
   final double review_lessor;
   final double review_noise;
   final double review_quality;
-  ReviewScreen2(
-      this.roadaddress,
-      this.review_lat,
-      this.review_lng,
-      this.review_area,
-      this.review_lessor,
-      this.review_noise,
-      this.review_quality);
+  Reviewmodify2(this.location, this.reviewid, this.review_area,
+      this.review_lessor, this.review_noise, this.review_quality);
   @override
-  State<ReviewScreen2> createState() => _ReviewScreen2State();
+  State<Reviewmodify2> createState() => _Reviewmodify2State();
 }
 
-class _ReviewScreen2State extends State<ReviewScreen2> {
-  final addmyController = TextEditingController();
-  final weaController = TextEditingController();
-  final etcController = TextEditingController();
-  String advantage = '';
-  String weakness = '';
-  String etc = '';
-  final ImagePicker picker = ImagePicker();
-  late final Function onMapCreated;
-  List<PickedFile> pickedFiles = [];
-  Future<String> userfetchData(uid) async {
-    final response =
-        await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
-    if (response.statusCode == 200) {
-      print('응답했다3');
-      print(utf8.decode(response.bodyBytes));
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-      print(Users.fromJson(data));
-      var _data = Users.fromJson(data);
-      Provider.of<UIDProvider>(context, listen: false)
-          .setdbToken(_data.nickName, _data.location, _data.valid);
-      return _data.valid;
-    } else {
-      print('Error: ${response.statusCode}');
-      throw Exception('Error: ${response.statusCode}');
-    }
-  }
+class _Reviewmodify2State extends State<Reviewmodify2> {
+  Reviewdetail? modify;
+  bool _isLoading = true;
+  TextEditingController advantageController = TextEditingController();
+  TextEditingController weaknessController = TextEditingController();
+  TextEditingController etcController = TextEditingController();
 
-  Future<String> sendPostRequest() async {
+  Future<String> modifyPostRequest() async {
     final dio = Dio();
-    var url = 'http://10.0.2.2:8080/map/${widget.roadaddress}/review/write';
+    var url =
+        'http://10.0.2.2:8080/map/${widget.location}/review/${widget.reviewid}/modify';
 
     Map<String, dynamic> createReviewDto = {
-      'memberId': Provider.of<UIDProvider>(context, listen: false).uid,
-      'location': widget.roadaddress,
       'grade': {
         'lessor': widget.review_lessor,
         'quality': widget.review_quality,
@@ -83,16 +52,33 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
             Provider.of<REVIEW2Provider>(context, listen: false).weakness,
         'etc': Provider.of<REVIEW2Provider>(context, listen: false).etc,
       },
-      'posx': widget.review_lat,
-      'posy': widget.review_lng,
     };
 
     FormData formData = FormData.fromMap({
-      'createReviewDto': MultipartFile.fromString(
+      'request': MultipartFile.fromString(
         jsonEncode(createReviewDto),
         contentType: MediaType('application', 'json'),
       ),
     });
+    if (selectedImages.isNotEmpty) {
+      for (var image in selectedImages) {
+        print('Selected Image: $image');
+        var contentType = image['headers']['Content-Type'][0];
+        var body = image['body'];
+        var decodedImage = base64Decode(body);
+
+        formData.files.add(
+          MapEntry(
+            'files', // 서버에서 사용할 파일 필드 이름
+            MultipartFile.fromBytes(
+              decodedImage,
+              filename: 'image.jpg',
+              contentType: MediaType.parse(contentType),
+            ),
+          ),
+        );
+      }
+    }
     if (pickedFiles.isNotEmpty) {
       for (PickedFile pickedFile in pickedFiles) {
         File imageFile = File(pickedFile.path);
@@ -135,6 +121,47 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
     }
   }
 
+  @override
+  void initState() {
+    reviewmodify2Data().then((value) {
+      modify = value;
+      advantageController.text = value.body.advantage;
+      weaknessController.text = value.body.weakness;
+      etcController.text = value.body.etc;
+      Provider.of<REVIEW2Provider>(context, listen: false).advantage =
+          value.body.advantage;
+      Provider.of<REVIEW2Provider>(context, listen: false).weakness =
+          value.body.weakness;
+      Provider.of<REVIEW2Provider>(context, listen: false).etc = value.body.etc;
+    });
+    super.initState();
+  }
+
+  Future<Reviewdetail> reviewmodify2Data() async {
+    final response = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/map/${widget.location}/review/${widget.reviewid}/modify'));
+    try {
+      if (response.statusCode == 200) {
+        print('응답했다');
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        var _data = Reviewdetail.fromJson(data);
+        setState(() {
+          _isLoading = false;
+        });
+        return _data;
+      } else {
+        throw Exception('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
+  List<PickedFile> pickedFiles = [];
+  final ImagePicker picker = ImagePicker();
+  List<Map<String, dynamic>> selectedImages = [];
+  late final Function onMapCreated;
+
   Future<void> selectImages(BuildContext context) async {
     final selectedFiles = await picker.pickMultiImage(
       maxWidth: 640,
@@ -172,45 +199,56 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>>? images = modify?.images;
+    selectedImages = List<Map<String, dynamic>>.from(images ?? []);
+    void _handleImageDelete(int index) {
+      setState(() {
+        if (images != null && images.isNotEmpty) {
+          images.removeAt(index); // 이미지 삭제
+
+          if (index < images.length) {
+            selectedImages.remove(images[index]); // 선택된 이미지 리스트에서 제거
+          }
+        }
+      });
+    }
+
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
-      child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 1,
-            title: Text(
-              '리뷰 작성(2/2)',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            foregroundColor: Colors.black,
-            leading: IconButton(
-              onPressed: () {
-                Provider.of<REVIEW2Provider>(context, listen: false)
-                    .setall(advantage = '', weakness = '', etc = '');
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back),
-            ),
-            actions: <Widget>[
-              IconButton(
-                onPressed: () {
-                  selectImages(context);
-                },
-                icon: Icon(
-                  Icons.photo_camera,
-                  size: 24,
-                  color: Colors.black,
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 1,
+              title: Text(
+                '리뷰 작성(2/2)',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            child: SafeArea(
+              foregroundColor: Colors.black,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    selectImages(context);
+                  },
+                  icon: Icon(
+                    Icons.photo_camera,
+                    size: 20,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.all(25),
                 child: Column(
@@ -228,11 +266,13 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                     Container(
                       padding: EdgeInsets.only(left: 5, right: 5),
                       child: TextFormField(
+                        controller: advantageController,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(250),
                         ],
-                        onChanged: _checkTextLength1,
-                        controller: addmyController,
+                        onChanged: (text) {
+                          _checkTextLength1(text);
+                        },
                         style: TextStyle(decorationThickness: 0),
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -264,11 +304,13 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                     Container(
                       padding: EdgeInsets.only(left: 5, right: 5),
                       child: TextFormField(
+                        controller: weaknessController,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(250),
                         ],
-                        onChanged: _checkTextLength2,
-                        controller: weaController,
+                        onChanged: (text) {
+                          _checkTextLength2(text);
+                        },
                         style: TextStyle(decorationThickness: 0),
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -300,11 +342,13 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                     Container(
                       padding: EdgeInsets.only(left: 5, right: 5),
                       child: TextFormField(
+                        controller: etcController,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(250),
                         ],
-                        onChanged: _checkTextLength3,
-                        controller: etcController,
+                        onChanged: (text) {
+                          _checkTextLength3(text);
+                        },
                         style: TextStyle(decorationThickness: 0),
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -322,14 +366,44 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 15,
-                    ),
+                    SizedBox(height: 20),
                     SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: [_buildPhotoArea()])),
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          _buildPhotoArea(),
+                          for (var image in images ?? [])
+                            Stack(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(3),
+                                  width: 76,
+                                  height: 76,
+                                  child: _isLoading
+                                      ? Center(
+                                          child: CircularProgressIndicator())
+                                      : modify?.buildImageWidget(image),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: IconButton(
+                                    icon: Icon(Icons.close),
+                                    iconSize: 20,
+                                    onPressed: () {
+                                      _handleImageDelete(
+                                          images!.indexOf(image));
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
                     SizedBox(
-                      height: 15,
+                      height: 20,
                     ),
                     ElevatedButton(
                       onPressed: Provider.of<REVIEW2Provider>(context)
@@ -380,73 +454,24 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                               } else {
                                 CircularProgressIndicator();
                                 // ignore: unused_local_variable
-                                String data = await sendPostRequest();
-                                // ignore: unused_local_variable
-                                String result = await userfetchData(
-                                    Provider.of<UIDProvider>(context,
-                                            listen: false)
-                                        .uid);
-                                print(widget.review_lat);
-                                Provider.of<LocationProvider>(context,
-                                        listen: false)
-                                    .setlocation(
-                                        widget.review_lat,
-                                        widget.review_lng,
-                                        widget.roadaddress,
-                                        1);
+                                String data = await modifyPostRequest();
+
                                 Navigator.pop(context);
                                 Navigator.pop(context);
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => RootTab(
-                                        latitude: widget.review_lat,
-                                        longitude: widget.review_lng,
-                                        location: widget.roadaddress,
-                                      ),
-                                    ));
+
                                 Provider.of<REVIEW2Provider>(context,
                                         listen: false)
-                                    .setall(advantage = '', weakness = '',
-                                        etc = '');
+                                    .setall('', '', '');
                                 Provider.of<REVIEWProvider>(context,
                                         listen: false)
                                     .setall(0, 0, 0, 0);
-                                // showDialog(
-                                //     context: context,
-                                //     builder: (BuildContext context) {
-                                //       return AlertDialog(
-                                //           content: Text(
-                                //             '이제 커뮤니티 이용이 가능합니다!',
-                                //             style: TextStyle(
-                                //               fontSize: 22,
-                                //               fontWeight: FontWeight.w700,
-                                //             ),
-                                //           ),
-                                //           actions: [
-                                //             Row(
-                                //                 mainAxisAlignment:
-                                //                     MainAxisAlignment.end,
-                                //                 children: [
-                                //                   Container(
-                                //                       child: TextButton(
-                                //                           child: Text(
-                                //                             '확인',
-                                //                             style: TextStyle(
-                                //                                 fontSize: 16.0,
-                                //                                 fontWeight:
-                                //                                     FontWeight
-                                //                                         .w700,
-                                //                                 color: Colors
-                                //                                     .black),
-                                //                           ),
-                                //                           onPressed: () {
-                                //                             Navigator.pop(
-                                //                                 context);
-                                //                           }))
-                                //                 ])
-                                //           ]);
-                                //     });
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        WrittenReviewScreen(),
+                                  ),
+                                );
                               }
                             },
                       style: ElevatedButton.styleFrom(
@@ -459,9 +484,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                   ],
                 ),
               ),
-            ),
-          )),
-    );
+            )));
   }
 
   void _checkTextLength1(String text) {

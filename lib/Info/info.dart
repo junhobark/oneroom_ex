@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
-import 'package:oneroom_ex/Info/info_certification.dart';
+import 'package:oneroom_ex/Info/_admin/info_certification.dart';
 import 'package:oneroom_ex/Info/info_written_board.dart';
 import 'package:oneroom_ex/Info/info_written_comment.dart';
 import 'package:oneroom_ex/Info/info_review/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:provider/provider.dart';
-import '../../login/uid_provider.dart';
-import '../_admin/adminlist.dart';
+import '../login/uid_provider.dart';
+import '_admin/adminlist.dart';
 
 class informationScreen extends StatefulWidget {
   const informationScreen({Key? key}) : super(key: key);
@@ -163,21 +163,24 @@ class _informationScreen extends State<informationScreen> {
                                 Provider.of<UIDProvider>(context, listen: false)
                                         .location !=
                                     null)
-                             TextSpan( children:[TextSpan(
-                                text:
-                                    '\n${Provider.of<UIDProvider>(context).location}  ',
-                                style: TextStyle(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
+                              TextSpan(children: [
+                                TextSpan(
+                                  text:
+                                      '\n${Provider.of<UIDProvider>(context).location}  ',
+                                  style: TextStyle(
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ), WidgetSpan(
-                              child: Icon(
-                                Icons.check_box,
-                                size: 22.0,
-                                color: Colors.black,
-                              ),
-                            ),]),
+                                WidgetSpan(
+                                  child: Icon(
+                                    Icons.check_box,
+                                    size: 22.0,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ]),
                           ],
                         ),
                       ),
@@ -344,14 +347,14 @@ class _informationScreen extends State<informationScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
+                        Navigator.of(context)
+                            .push(
                           MaterialPageRoute(
                             builder: (BuildContext context) => Adminlist(),
                           ),
-                        ).then((value){
-                          setState(() {
-
-                          });
+                        )
+                            .then((value) {
+                          setState(() {});
                         });
                       },
                       child: Text(

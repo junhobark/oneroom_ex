@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:oneroom_ex/Info/info_review/modify/reviewmodify1.dart';
 import 'package:oneroom_ex/Info/info_review/reviewinfo_class.dart';
 import 'package:provider/provider.dart';
 import '../../common/colors.dart';
@@ -214,7 +215,17 @@ class _WrittenReviewScreenState extends State<WrittenReviewScreen> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        Reviewmodify1(
+                                                            reviews.location,
+                                                            reviews.id),
+                                              ),
+                                            );
+                                          },
                                           child: Text(
                                             '수정',
                                             style: TextStyle(fontSize: 14),
