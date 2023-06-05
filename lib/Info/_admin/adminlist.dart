@@ -21,7 +21,7 @@ class _AdminlistState extends State<Adminlist> {
       if (response.statusCode == 200) {
         final datadetail =
             jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-
+print(datadetail.map((item) => Admininfo.fromJson(item)).toList());
         return datadetail.map((item) => Admininfo.fromJson(item)).toList();
       } else {
         print('An error occurred: e');
@@ -44,6 +44,24 @@ class _AdminlistState extends State<Adminlist> {
             future: admininfofetchData(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                if (snapshot.data!.isEmpty) {return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                            child: Text(
+                              '거주지 인증요청이 없어요',
+                              style: TextStyle(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            )),
+                      ],
+                    ),
+                  ),
+                );}else{
                 return Flex(
                   direction: Axis.vertical,
                   children: [
@@ -99,30 +117,13 @@ class _AdminlistState extends State<Adminlist> {
                           }),
                     ),
                   ],
-                );
+                );}
               } else if (snapshot.hasError) {
                 return SnackBar(
                   content: Text('error 에러!!'),
                 );
               }
-              return SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                          child: Text(
-                        '거주지 인증요청이 없어요',
-                        style: TextStyle(
-                          fontSize: 22.0,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )),
-                    ],
-                  ),
-                ),
-              );
+              return Container();
             },
           ),
         ),

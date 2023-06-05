@@ -145,6 +145,24 @@ class favoriteScreenState extends State<favoriteScreen> {
               future: favoritefetchData(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  if (snapshot.data!.isEmpty)  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: Text(
+                              '등록된 관심 건물이 없어요 😥',
+                              style: TextStyle(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),);else{
                   return Flex(
                     direction: Axis.vertical,
                     children: [
@@ -264,7 +282,7 @@ class favoriteScreenState extends State<favoriteScreen> {
                             }),
                       ),
                     ],
-                  );
+                  );}
                 } else if (snapshot.hasError) {
                   return Text("${snapshot.error}에러!!");
                 }
