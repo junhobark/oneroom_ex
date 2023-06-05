@@ -9,10 +9,11 @@ import 'package:provider/provider.dart';
 import '../../common/default_layout.dart';
 import '../../login/uid_provider.dart';
 import '../../login/users.dart';
-import '../../map/mapScreen.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
+
+import '../../map/mapScreen.dart';
 
 void main() {
   runApp(const CertificationScreen());

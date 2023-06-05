@@ -44,6 +44,32 @@ class _mapScreenState extends State<mapScreen>
   List<Reviewdetail> reviews = [];
   List<Favorite> favorite = [];
 
+  Future<List<Mapmarkers>> sendGetmarkerFormData(lat, lng) async {
+    var url = 'http://10.0.2.2:8080/map/building';
+
+    final queryParameters = {
+      'lat': lat.toString(),
+      'lon': lng.toString(),
+      'memberId': '${Provider.of<UIDProvider>(context, listen: false).uid}',
+    };
+    final uri = Uri.parse(url).replace(queryParameters: queryParameters);
+
+    // GET 요청 보내기
+    final response = await http.get(uri);
+
+    // 응답 처리
+    if (response.statusCode == 200) {
+      print('요청성공!!!!!!!,${lat},${lng}');
+      // 응답을 JSON으로 파싱하여 데이터 처리
+      final List<dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+
+      return jsonData.map((data) => Mapmarkers.fromJson(data)).toList();
+    } else {
+      // 요청이 실패한 경우 예외 처리
+      throw Exception('Failed to load building list');
+    }
+  }
+
   Future<String?> favoritePostRequest(
       String uid, String location, double lat, double lng) async {
     final dio = Dio();
@@ -74,6 +100,7 @@ class _mapScreenState extends State<mapScreen>
         },
       ),
     );
+
     if (response.statusCode == 200) {
       print('요청성공!,');
       String result = '성공';
@@ -138,18 +165,6 @@ class _mapScreenState extends State<mapScreen>
     }
   }
 
-  Future<List<Mapmarkers>> markerfetchData() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:8080/map/test'));
-    if (response.statusCode == 200) {
-      print('응답했다1');
-      print(utf8.decode(response.bodyBytes));
-      final data = jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-      return data.map((item) => Mapmarkers.fromJson(item)).toList();
-    } else {
-      throw Exception('Error: ${response.statusCode}');
-    }
-  }
-
   Future<List<Reviewdetail>> reviewfetchData(location) async {
     final response = await http
         .get(Uri.parse('http://10.0.2.2:8080/map/${location}/review'));
@@ -178,14 +193,10 @@ class _mapScreenState extends State<mapScreen>
   late double _latitude;
   late double _longitude;
   late String _location;
+
   @override
   void initState() {
     super.initState();
-    markerfetchData().then((data) {
-      setState(() {
-        mapmarkers = data;
-      });
-    });
     favoritefetchData().then((data) {
       setState(() {
         favorite = data!;
@@ -203,15 +214,19 @@ class _mapScreenState extends State<mapScreen>
         children: [
           KakaoMap(
               onMapCreated: ((controller) async {
-                setState(() {
+                setState(() async{
+                  await sendGetmarkerFormData(widget.latitude,widget.longitude).then((data) {
+                    setState(() {
+                      mapmarkers = data;
+                    });
+                  });
                   mapController = controller;
-                  markers.clear();
                   mapmarkers.map((data) async {
                     markers.add(Marker(
                         markerId: data.id.toString(),
                         latLng: LatLng(data.posx, data.posy),
                         markerImageSrc:
-                            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
+                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
                   }).toList();
                   int en = 0;
                   if (_location != "") {
@@ -248,9 +263,36 @@ class _mapScreenState extends State<mapScreen>
                   }
                 });
               }),
+              onDragChangeCallback: ((latLng, zoomLevel, dragType) async {
+                switch (dragType) {
+                  case DragType.end:
+                    final latLng = await mapController.getCenter();
+                    sendGetmarkerFormData(latLng.latitude, latLng.longitude);
+                    setState(() {
+                      markers.clear();
+                      mapmarkers.map((data) async {
+                        markers.add(Marker(
+                            markerId: data.id.toString(),
+                            latLng: LatLng(data.posx, data.posy),
+                            markerImageSrc:
+                                'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
+                      }).toList();
+                    });
+                    break;
+
+                  default:
+                    break;
+                }
+              }),
               markers: markers.toList(),
               currentLevel: 1,
               onMarkerTap: (markerId, latLng, zoomLevel) {
+                sendGetmarkerFormData(latLng.latitude, latLng.longitude).then((data) {
+                  setState(() {
+                    mapmarkers = data;
+                  });
+                });
+
                 map_showDialog(markerId);
               },
               center: LatLng(_latitude, _longitude)),
@@ -305,7 +347,6 @@ class _mapScreenState extends State<mapScreen>
                   Icon(
                     Icons.search,
                     size: 23,
-                    color: Theme.of(context).textTheme.bodyText1!.color,
                   ),
                 ]),
               ),
@@ -342,7 +383,14 @@ class _mapScreenState extends State<mapScreen>
                               .cnt ==
                           1) {
                         setState(() {
-                          markerfetchData().then((data) {
+                          sendGetmarkerFormData(
+                                  Provider.of<LocationProvider>(context,
+                                          listen: false)
+                                      .lat,
+                                  Provider.of<LocationProvider>(context,
+                                          listen: false)
+                                      .lng)
+                              .then((data) {
                             setState(() {
                               mapmarkers = data;
                             });
@@ -354,6 +402,7 @@ class _mapScreenState extends State<mapScreen>
                               Provider.of<LocationProvider>(context,
                                       listen: false)
                                   .lng));
+
                           for (var data in mapmarkers) {
                             if (data.location ==
                                 Provider.of<LocationProvider>(context,
@@ -376,6 +425,12 @@ class _mapScreenState extends State<mapScreen>
                   ),
                 ),
               )),
+          // Positioned(
+          //   child: FloatingActionButton(
+          //     onPressed: () async {},
+          //     child: Icon(Icons.add),
+          //   ),
+          // )
         ],
       ),
     );
@@ -408,6 +463,11 @@ class _mapScreenState extends State<mapScreen>
       var lng = kakaoLongitude;
       int cn = 0;
       if (selectedPlace != null) {
+        sendGetmarkerFormData(lat, lng).then((data) {
+          setState(() {
+            mapmarkers = data;
+          });
+        });
         mapController.panTo(LatLng(lat, lng));
         for (var data in mapmarkers) {
           if (data.location == roadaddress) {
@@ -691,7 +751,7 @@ class _mapScreenState extends State<mapScreen>
           });
           islike(data.location);
           var location = data.location;
-          Future.delayed(Duration(milliseconds: 250), () {
+          Future.delayed(Duration(milliseconds: 250), (){
             showDialog(
               context: context,
               barrierDismissible: true,
@@ -748,7 +808,7 @@ class _mapScreenState extends State<mapScreen>
                                       ),
                                       SizedBox(width: 10),
                                       Text(
-                                        '${NumberFormat("#.#").format(totalgrade() / (4 * totalcount()))}',
+                                        '${NumberFormat("#.#").format(data.totalgrade/(4 * data.reviewCount))}',
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold),
@@ -757,7 +817,7 @@ class _mapScreenState extends State<mapScreen>
                                         width: 5,
                                       ),
                                       Text(
-                                        '(리뷰 ${totalcount()})',
+                                        '(리뷰 ${data.reviewCount})',
                                         style: TextStyle(fontSize: 10),
                                       )
                                     ],
@@ -771,7 +831,7 @@ class _mapScreenState extends State<mapScreen>
                                   Text("${data.location}",
                                       style: TextStyle(fontSize: 12)),
                                   RatingBarIndicator(
-                                    rating: totalgrade() / (4 * totalcount()),
+                                    rating: data.totalgrade / (4 *data.reviewCount),
                                     itemBuilder: (context, index) => Icon(
                                       Icons.star,
                                       color: Colors.amber,
@@ -836,27 +896,6 @@ class _mapScreenState extends State<mapScreen>
     isLiked = !isLiked;
     Provider.of<LikeProvider>(context, listen: false).toggleLike();
     return isLiked;
-  }
-
-  int totalcount() {
-    int count = 0;
-    // ignore: unused_local_variable
-    for (var data in reviews) {
-      count = count + 1;
-    }
-    return count;
-  }
-
-  double totalgrade() {
-    double grade = 0;
-    for (var data in reviews) {
-      grade = grade +
-          (data.grade.area +
-              data.grade.lessor +
-              data.grade.noise +
-              data.grade.quality);
-    }
-    return grade;
   }
 
   bottom_sheetdata(String location, double lat, double lng) {

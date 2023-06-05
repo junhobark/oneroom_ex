@@ -16,7 +16,6 @@ import 'map/locationProvider.dart';
 import 'map/pos_provideer.dart';
 import 'map/review_detail/review1_provider.dart';
 import 'map/review_detail/review2_provider.dart';
-import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,7 +72,7 @@ class _App extends StatelessWidget {
       }
     }
 
-    return GetMaterialApp(
+    return MaterialApp(
       theme: ThemeData(
         fontFamily: 'NotoSans',
       ),
