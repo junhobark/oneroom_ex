@@ -25,10 +25,11 @@ class _informationScreen extends State<informationScreen> {
   User? loggedUser;
 
   var users;
-
+  String data = 'false';
   void initState() {
     super.initState();
     getCurrentUser();
+    adminauthority(Provider.of<UIDProvider>(context,listen:false).uid);
   }
 
   void getCurrentUser() {
@@ -69,6 +70,20 @@ class _informationScreen extends State<informationScreen> {
         child: Text('로그아웃'),
       ),
     );
+  }
+  Future<String> adminauthority(String id) async {
+    final response =
+    await http.get(Uri.parse('http://10.0.2.2:8080/user/${id}/admin'));
+    if (response.statusCode == 200) {
+      print('응답했다3');
+      print(utf8.decode(response.bodyBytes));
+      data = utf8.decode(response.bodyBytes);
+      return data;
+    }
+    else{
+      String result='fail';
+      return result;
+    }
   }
   Future<void> deletelocation(String id) async {
     var url = Uri.parse(
@@ -261,22 +276,6 @@ class _informationScreen extends State<informationScreen> {
                                   ],
                                 ),
                               ]),
-
-                            // if (Provider.of<UIDProvider>(context, listen: false)
-                            //     .valid ==
-                            //     "ONGOING" &&
-                            //     Provider.of<UIDProvider>(context, listen: false)
-                            //         .location !=
-                            //         null)
-                            //   TextSpan(
-                            //     text:
-                            //     '\n${Provider.of<UIDProvider>(context).location}',
-                            //     style: TextStyle(
-                            //       fontSize: 22.0,
-                            //       fontWeight: FontWeight.w700,
-                            //       color: Colors.black,
-                            //     ),
-                            //   ),
                             if (Provider.of<UIDProvider>(context, listen: false)
                                         .valid ==
                                     "CERTIFIED" &&
@@ -466,24 +465,29 @@ class _informationScreen extends State<informationScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => Adminlist(),
-                          ),
-                        )
-                            .then((value) {
-                          setState(() {});
-                        });
-                      },
-                      child: Text(
+                      onTap: () async {
+
+                           Navigator.of(context)
+                               .push(
+                             MaterialPageRoute(
+                               builder: (BuildContext context) => Adminlist(),
+                             ),
+                           )
+                               .then((value) {
+                             setState(() {});
+                           });
+                         },
+
+                      child:
+
+
+        data == 'true'? Text(
                         'go amin',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12.0,
                         ),
-                      ),
+                      ) : Text(''),
                     ),
                   ],
                 ),
