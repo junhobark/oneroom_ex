@@ -66,7 +66,7 @@ class _App extends StatelessWidget {
           _data.location,
           _data.valid,
         );
-        print('user 가입 정보: ${_data.nickName}, ${_data.valid}');
+        print('user 가입 정보: ${_data.nickName}, ${_data.valid},${ _data.location}');
       } else {
         print('Error: ${response.statusCode}');
       }

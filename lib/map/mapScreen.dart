@@ -179,6 +179,7 @@ class _mapScreenState extends State<mapScreen>
   }
 
   late KakaoMapController mapController;
+  int currentLevel = 0;
   List<Marker> markers = [];
   var model = null;
   var selectedPlace = null;
@@ -215,12 +216,12 @@ class _mapScreenState extends State<mapScreen>
           KakaoMap(
               onMapCreated: ((controller) async {
                 setState(() async{
+                  mapController = controller;
                   await sendGetmarkerFormData(widget.latitude,widget.longitude).then((data) {
                     setState(() {
                       mapmarkers = data;
                     });
                   });
-                  mapController = controller;
                   mapmarkers.map((data) async {
                     markers.add(Marker(
                         markerId: data.id.toString(),
@@ -229,6 +230,7 @@ class _mapScreenState extends State<mapScreen>
                         'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
                   }).toList();
                   int en = 0;
+                  print("관심건물 위치:${_location}");
                   if (_location != "") {
                     for (var data in mapmarkers) {
                       if (_location == data.location) {
@@ -254,13 +256,14 @@ class _mapScreenState extends State<mapScreen>
                         setState(() {
                           favorite = data!;
                         });
-                      });
-                      islike(_location);
-                      Future.delayed(Duration(milliseconds: 250), () {
-                        map_showDialog('maId');
+                        islike(_location);
+                        Future.delayed(Duration(milliseconds: 250), () {
+                          map_showDialog('maId');
+                        });
                       });
                     }
                   }
+                  currentLevel = await mapController.getLevel();
                 });
               }),
               onDragChangeCallback: ((latLng, zoomLevel, dragType) async {
@@ -279,7 +282,6 @@ class _mapScreenState extends State<mapScreen>
                       }).toList();
                     });
                     break;
-
                   default:
                     break;
                 }
@@ -287,12 +289,15 @@ class _mapScreenState extends State<mapScreen>
               markers: markers.toList(),
               currentLevel: 1,
               onMarkerTap: (markerId, latLng, zoomLevel) {
+               if(currentLevel>1)
+                 currentLevel = 1;
+               mapController.setLevel(currentLevel);
+               mapController.panTo(latLng);
                 sendGetmarkerFormData(latLng.latitude, latLng.longitude).then((data) {
                   setState(() {
                     mapmarkers = data;
                   });
                 });
-
                 map_showDialog(markerId);
               },
               center: LatLng(_latitude, _longitude)),
@@ -372,7 +377,43 @@ class _mapScreenState extends State<mapScreen>
                 width: 50,
                 height: 50,
                 child: IconButton(
-                  onPressed: () {
+                  onPressed:
+    Provider.of<UIDProvider>(context, listen: false).location ==null?
+    ()  {showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              content: Text(
+                '거주지 인증을 먼저 완료해주세요!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              actions: [
+                Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.end,
+                    children: [
+                      Container(
+                          child: TextButton(
+                              child: Text(
+                                '확인',
+                                style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight:
+                                        FontWeight
+                                            .w700,
+                                    color: Colors
+                                        .black),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(
+                                    context);
+                              }))
+                    ])
+              ]);
+        });  }: (){
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) {
@@ -395,7 +436,13 @@ class _mapScreenState extends State<mapScreen>
                               mapmarkers = data;
                             });
                           });
-                          mapController.panTo(LatLng(
+                          if(currentLevel>1)
+                            currentLevel = 1;
+                          mapController.setLevel(currentLevel);
+                          if(  Provider.of<LocationProvider>(context,
+                              listen: false)
+                              .lat != 0)
+                        {  mapController.panTo(LatLng(
                               Provider.of<LocationProvider>(context,
                                       listen: false)
                                   .lat,
@@ -411,7 +458,7 @@ class _mapScreenState extends State<mapScreen>
                               map_showDialog(data.id.toString());
                               break;
                             }
-                          }
+                          }}
                           ;
                         });
                         Provider.of<LocationProvider>(context, listen: false)
@@ -425,12 +472,6 @@ class _mapScreenState extends State<mapScreen>
                   ),
                 ),
               )),
-          // Positioned(
-          //   child: FloatingActionButton(
-          //     onPressed: () async {},
-          //     child: Icon(Icons.add),
-          //   ),
-          // )
         ],
       ),
     );
@@ -468,6 +509,9 @@ class _mapScreenState extends State<mapScreen>
             mapmarkers = data;
           });
         });
+        if(currentLevel>1)
+          currentLevel = 1;
+        mapController.setLevel(currentLevel);
         mapController.panTo(LatLng(lat, lng));
         for (var data in mapmarkers) {
           if (data.location == roadaddress) {

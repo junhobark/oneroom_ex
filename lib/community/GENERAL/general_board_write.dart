@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneroom_ex/common/colors.dart';
+import 'package:oneroom_ex/login/uid_provider.dart';
+import 'package:provider/provider.dart';
 
 class GeneralBoardWrite extends StatefulWidget {
   const GeneralBoardWrite({Key? key}) : super(key: key);
@@ -59,7 +61,7 @@ class _GeneralBoardWriteState extends State<GeneralBoardWrite> {
     var url = 'http://10.0.2.2:8080/community/GENERAL/write';
 
     Map<String, dynamic> postDto = {
-      'memberId': 'abc',
+      'memberId': '${Provider.of<UIDProvider>(context,listen: false).uid}',
       'title': titleInput,
       'body': bodyInput,
     };

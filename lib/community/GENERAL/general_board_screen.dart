@@ -6,6 +6,9 @@ import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_postId.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_search.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_write.dart';
+import 'package:provider/provider.dart';
+
+import '../../login/uid_provider.dart';
 
 class GeneralBoardScreen extends StatefulWidget {
   @override
@@ -55,7 +58,43 @@ class _GeneralBoardScreenState extends State<GeneralBoardScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: Provider.of<UIDProvider>(context, listen: false)
+                .valid !=
+                "CERTIFIED"  ? (){showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                      content: Text(
+                        '거주지 인증을 먼저 완료해주세요!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      actions: [
+                        Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                  child: TextButton(
+                                      child: Text(
+                                        '확인',
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight:
+                                            FontWeight
+                                                .w700,
+                                            color: Colors
+                                                .black),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(
+                                            context);
+                                      }))
+                            ])
+                      ]);
+                }); } :() {
               Navigator.of(context)
                   .push(
                 MaterialPageRoute(
@@ -71,7 +110,43 @@ class _GeneralBoardScreenState extends State<GeneralBoardScreen> {
             icon: Icon(Icons.search),
           ),
           IconButton(
-            onPressed: () async {
+            onPressed: Provider.of<UIDProvider>(context, listen: false)
+                .valid !=
+                "CERTIFIED"  ? (){showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                      content: Text(
+                        '거주지 인증을 먼저 완료해주세요!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      actions: [
+                        Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                  child: TextButton(
+                                      child: Text(
+                                        '확인',
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight:
+                                            FontWeight
+                                                .w700,
+                                            color: Colors
+                                                .black),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(
+                                            context);
+                                      }))
+                            ])
+                      ]);
+                }); } :() async {
               final newPost = await Navigator.of(context)
                   .push(
                 MaterialPageRoute(
@@ -115,7 +190,43 @@ class _GeneralBoardScreenState extends State<GeneralBoardScreen> {
 
                   //인기글
                   child: ListTile(
-                    onTap: () {
+                    onTap: Provider.of<UIDProvider>(context, listen: false)
+                        .valid !=
+                        "CERTIFIED"  ? (){showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                              content: Text(
+                                '거주지 인증을 먼저 완료해주세요!',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              actions: [
+                                Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          child: TextButton(
+                                              child: Text(
+                                                '확인',
+                                                style: TextStyle(
+                                                    fontSize: 16.0,
+                                                    fontWeight:
+                                                    FontWeight
+                                                        .w700,
+                                                    color: Colors
+                                                        .black),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                    context);
+                                              }))
+                                    ])
+                              ]);
+                        }); } :() {
                       Navigator.of(context)
                           .push(
                         MaterialPageRoute(
@@ -232,7 +343,43 @@ class _GeneralBoardScreenState extends State<GeneralBoardScreen> {
 
                     //일반글
                     child: ListTile(
-                      onTap: () {
+                      onTap: Provider.of<UIDProvider>(context, listen: false)
+                        .valid !=
+                        "CERTIFIED"  ? (){showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                                content: Text(
+                                  '거주지 인증을 먼저 완료해주세요!',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                actions: [
+                                  Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                            child: TextButton(
+                                                child: Text(
+                                                  '확인',
+                                                  style: TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight:
+                                                      FontWeight
+                                                          .w700,
+                                                      color: Colors
+                                                          .black),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(
+                                                      context);
+                                                }))
+                                      ])
+                                ]);
+                          }); } :() {
                         Navigator.of(context)
                             .push(
                           MaterialPageRoute(
@@ -335,7 +482,7 @@ class _GeneralBoardScreenState extends State<GeneralBoardScreen> {
                               ),
                               SizedBox(width: 5),
                               Text(
-                                '${GNP['authorName']}****',
+                                '${GNP['authorName'].replaceFirst('경남 진주시 ', '')}***',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16.0,

@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneroom_ex/common/colors.dart';
+import 'package:provider/provider.dart';
+
+import '../../login/uid_provider.dart';
 
 class GeneralBoardWriteEdit extends StatefulWidget {
   final int id;
@@ -96,7 +99,7 @@ class _GeneralBoardWriteEditState extends State<GeneralBoardWriteEdit> {
     var url = 'http://10.0.2.2:8080/community/GENERAL/${widget.id}/modify';
 
     Map<String, dynamic> postDto = {
-      'memberId': 'abc',
+      'memberId': '${Provider.of<UIDProvider>(context,listen: false).uid}',
       'title': titleController.text,
       'body': bodyController.text,
     };

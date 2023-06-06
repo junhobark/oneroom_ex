@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_screen.dart';
 import 'package:oneroom_ex/community/TIPS/tipsboard.dart';
+import 'package:provider/provider.dart';
+import '../login/uid_provider.dart';
+import 'GENERAL/general_board_postId.dart';
 import 'MARKET/marketboard.dart';
 import 'package:http/http.dart' as http;
 
@@ -98,41 +101,93 @@ class _communityScreenState extends State<communityScreen> {
                   Column(
                     children: [
                       for (var item in generalData)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${item['title']}',
-                                style: TextStyle(color: Colors.black, fontSize: 18.0),
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.thumb_up_alt_outlined,
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    '${item['likes']}',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                  SizedBox(width: 20),
-                                  Icon(
-                                    Icons.mode_comment_outlined,
-                                    size: 15,
-                                    color: Colors.blue,
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    '${item['commentCount']}',
-                                    style: TextStyle(color: Colors.blue),
-                                  )
-                                ],
-                              ),
-                            ],
+                        GestureDetector(
+                          onTap: Provider.of<UIDProvider>(context, listen: false)
+        .valid !=
+    "CERTIFIED"  ? (){showDialog(
+    context: context,
+    builder: (BuildContext context) {
+    return AlertDialog(
+    content: Text(
+    '거주지 인증을 먼저 완료해주세요!',
+    style: TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+    ),
+    ),
+    actions: [
+    Row(
+    mainAxisAlignment:
+    MainAxisAlignment.end,
+    children: [
+    Container(
+    child: TextButton(
+    child: Text(
+    '확인',
+    style: TextStyle(
+    fontSize: 16.0,
+    fontWeight:
+    FontWeight
+        .w700,
+    color: Colors
+        .black),
+    ),
+    onPressed: () {
+    Navigator.pop(
+    context);
+    }))
+    ])
+    ]);
+    }); } :() {
+    Navigator.of(context)
+        .push(
+    MaterialPageRoute(
+    builder: (BuildContext context) => GeneralBoardPostId(
+    item['id']), //id값을 넘김
+    ),
+    )
+        .then((value) {
+    setState(() {
+    fetchData();
+    });
+    });
+    },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${item['title']}',
+                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.thumb_up_alt_outlined,
+                                      size: 16,
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      '${item['likes']}',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                    SizedBox(width: 20),
+                                    Icon(
+                                      Icons.mode_comment_outlined,
+                                      size: 15,
+                                      color: Colors.blue,
+                                    ),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      '${item['commentCount']}',
+                                      style: TextStyle(color: Colors.blue),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                     ],
@@ -142,6 +197,7 @@ class _communityScreenState extends State<communityScreen> {
 
               //자취 꿀팁
               Column(
+
                 children: [
                   Row(
                     children: [
@@ -179,41 +235,93 @@ class _communityScreenState extends State<communityScreen> {
                   Column(
                     children: [
                       for (var item in tipsData)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${item['title']}',
-                                style: TextStyle(color: Colors.black, fontSize: 18.0),
+                        GestureDetector(
+                          onTap: Provider.of<UIDProvider>(context, listen: false)
+                              .valid !=
+                              "CERTIFIED"  ? (){showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    content: Text(
+                                      '거주지 인증을 먼저 완료해주세요!',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    actions: [
+                                      Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                                child: TextButton(
+                                                    child: Text(
+                                                      '확인',
+                                                      style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                          FontWeight
+                                                              .w700,
+                                                          color: Colors
+                                                              .black),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.pop(
+                                                          context);
+                                                    }))
+                                          ])
+                                    ]);
+                              }); } :() {
+                            Navigator.of(context)
+                                .push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => GeneralBoardPostId(
+                                    item['id']), //id값을 넘김
                               ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.thumb_up_alt_outlined,
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    '${item['likes']}',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                  SizedBox(width: 20),
-                                  Icon(
-                                    Icons.mode_comment_outlined,
-                                    size: 15,
-                                    color: Colors.blue,
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    '${item['commentCount']}',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ],
-                              )
-                            ],
+                            )
+                                .then((value) {
+                              setState(() {
+                                fetchData();
+                              });
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${item['title']}',
+                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.thumb_up_alt_outlined,
+                                      size: 16,
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      '${item['likes']}',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                    SizedBox(width: 20),
+                                    Icon(
+                                      Icons.mode_comment_outlined,
+                                      size: 15,
+                                      color: Colors.blue,
+                                    ),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      '${item['commentCount']}',
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                     ],
@@ -260,41 +368,93 @@ class _communityScreenState extends State<communityScreen> {
                   Column(
                     children: [
                       for (var item in marketData)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${item['title']}',
-                                style: TextStyle(color: Colors.black, fontSize: 18.0),
+                        GestureDetector(
+                          onTap: Provider.of<UIDProvider>(context, listen: false)
+                              .valid !=
+                              "CERTIFIED"  ? (){showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    content: Text(
+                                      '거주지 인증을 먼저 완료해주세요!',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    actions: [
+                                      Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                                child: TextButton(
+                                                    child: Text(
+                                                      '확인',
+                                                      style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                          FontWeight
+                                                              .w700,
+                                                          color: Colors
+                                                              .black),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.pop(
+                                                          context);
+                                                    }))
+                                          ])
+                                    ]);
+                              }); } :() {
+                            Navigator.of(context)
+                                .push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => GeneralBoardPostId(
+                                    item['id']), //id값을 넘김
                               ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.thumb_up_alt_outlined,
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    '${item['likes']}',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                  SizedBox(width: 20),
-                                  Icon(
-                                    Icons.mode_comment_outlined,
-                                    size: 15,
-                                    color: Colors.blue,
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    '${item['commentCount']}',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ],
-                              )
-                            ],
+                            )
+                                .then((value) {
+                              setState(() {
+                                fetchData();
+                              });
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${item['title']}',
+                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.thumb_up_alt_outlined,
+                                      size: 16,
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      '${item['likes']}',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                    SizedBox(width: 20),
+                                    Icon(
+                                      Icons.mode_comment_outlined,
+                                      size: 15,
+                                      color: Colors.blue,
+                                    ),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      '${item['commentCount']}',
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                     ],

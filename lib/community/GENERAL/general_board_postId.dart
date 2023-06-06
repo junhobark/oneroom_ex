@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_screen.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_write_edit.dart';
+import 'package:oneroom_ex/login/uid_provider.dart';
+import 'package:provider/provider.dart';
 
 class GeneralBoardPostId extends StatefulWidget {
   final int id;
@@ -80,7 +82,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
   Future<void> postLike() async {
     var url =
         Uri.parse('http://10.0.2.2:8080/community/GENERAL/${widget.id}/like');
-    var body = {"memberId": "abc"};
+    var body = {"memberId": "${Provider.of<UIDProvider>(context,listen: false).uid}"};
 
     var response = await http.post(
       url,
@@ -102,7 +104,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
   Future<void> commentLike(int commentId) async {
     var url = Uri.parse(
         'http://10.0.2.2:8080/community/GENERAL/${widget.id}/${commentId}/like');
-    var body = {"memberId": "abc"};
+    var body = {"memberId": "${Provider.of<UIDProvider>(context,listen: false).uid}"};
 
     var response = await http.post(
       url,
@@ -125,7 +127,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
     var url = Uri.parse(
         'http://10.0.2.2:8080/community/GENERAL/${widget.id}/writeComment');
     var body = {
-      "memberId": "abc",
+      "memberId": "${Provider.of<UIDProvider>(context,listen: false).uid}",
       "postId": "${widget.id}",
       "body": commentController.text,
     };
@@ -225,7 +227,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${postData!['authorName']}****',
+                                      '${postData!['authorName'].replaceFirst('경남 진주시 ', '')}***',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16.0,
@@ -382,7 +384,8 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                       ),
                                       //본문 수정
                                       Row(
-                                        children: [
+                                        children:
+                                       [ if('${Provider.of<UIDProvider>(context,listen: false).uid}'  == postData!['memberId'])
                                           TextButton(
                                             onPressed: () {
                                               Navigator.of(context)
@@ -409,8 +412,8 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                                 color: BODY_TEXT_COLOR,
                                               ),
                                             ),
-                                          ),
-
+                                          ) ,
+                                         if('${Provider.of<UIDProvider>(context,listen: false).uid}'  == postData!['memberId'])
                                           //본문 삭제
                                           TextButton(
                                             onPressed: () {
@@ -651,6 +654,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                             Row(
                                               children: [
                                                 //댓글 수정
+                                                if('${Provider.of<UIDProvider>(context,listen: false).uid}' == comment['memberId'])
                                                 TextButton(
                                                   onPressed: () {
                                                     setState(() {
@@ -677,6 +681,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                                   ),
                                                 ),
                                                 //댓글 삭제 버튼
+                                                if('${Provider.of<UIDProvider>(context,listen: false).uid}' == comment['memberId'])
                                                 TextButton(
                                                   onPressed: () {
                                                     showDialog(
@@ -715,6 +720,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                                                     commentId);
                                                               },
                                                             ),
+
                                                             TextButton(
                                                               child: Text(
                                                                 '아니오',

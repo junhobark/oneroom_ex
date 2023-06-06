@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kpostal/kpostal.dart';
+import 'package:oneroom_ex/login/uid_provider.dart';
 import 'package:oneroom_ex/map/review2.dart';
 import 'package:oneroom_ex/map/review_detail/review1_provider.dart';
 import 'package:provider/provider.dart';
@@ -248,6 +249,7 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
                             0
                     ? null
                     : () {
+                  if(roadaddress == Provider.of<UIDProvider>(context,listen: false).location)
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) {
@@ -261,6 +263,43 @@ class _ReviewScreen1State extends State<ReviewScreen1> {
                                 review_quality);
                           }),
                         );
+                  else{
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                              content: Text(
+                                '인증한 주소와 일치하지 않아요!',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              actions: [
+                                Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          child: TextButton(
+                                              child: Text(
+                                                '확인',
+                                                style: TextStyle(
+                                                    fontSize: 16.0,
+                                                    fontWeight:
+                                                    FontWeight
+                                                        .w700,
+                                                    color: Colors
+                                                        .black),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                    context);
+                                              }))
+                                    ])
+                              ]);
+                        });
+                  }
                       },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
@@ -8,8 +10,9 @@ import 'package:oneroom_ex/Info/info_review/info_written_review.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
+import '../login/users.dart';
 import '_admin/adminlist.dart';
-
+import 'package:http/http.dart'as http;
 class informationScreen extends StatefulWidget {
   const informationScreen({Key? key}) : super(key: key);
 
@@ -67,7 +70,45 @@ class _informationScreen extends State<informationScreen> {
       ),
     );
   }
+  Future<void> deletelocation(String id) async {
+    var url = Uri.parse(
+        'http://10.0.2.2:8080/user/authorization');
+    var requestBody = {"memberId": id};
 
+    try {
+      var response = await http.delete(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        print('성공');
+
+      } else {
+        print('Failed:${response.statusCode}');
+      }
+    } catch (error) {
+      print(' $error');
+    }
+  }
+  Future<String> userfetchData(uid) async {
+    final response =
+    await http.get(Uri.parse('http://10.0.2.2:8080/user/${uid}'));
+    if (response.statusCode == 200) {
+      print('응답했다3');
+      print(utf8.decode(response.bodyBytes));
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      print(Users.fromJson(data));
+      var _data = Users.fromJson(data);
+      Provider.of<UIDProvider>(context, listen: false)
+          .setdbToken(_data.nickName, _data.location, _data.valid);
+      return _data.valid;
+    } else {
+      print('Error: ${response.statusCode}');
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,8 +159,11 @@ class _informationScreen extends State<informationScreen> {
                               ),
                             ),
                             if (Provider.of<UIDProvider>(context, listen: false)
-                                    .valid ==
-                                "UNCERTIFIED")
+                                        .valid ==
+                                    "UNCERTIFIED" &&
+                                Provider.of<UIDProvider>(context, listen: false)
+                                        .location ==
+                                    null)
                               TextSpan(
                                 text: '\n거주지를 인증해주세요',
                                 style: TextStyle(
@@ -134,29 +178,105 @@ class _informationScreen extends State<informationScreen> {
                                 Provider.of<UIDProvider>(context, listen: false)
                                         .location ==
                                     null)
-                              TextSpan(
-                                text: '\n인증중입니다(기다려주세요)',
-                                style: TextStyle(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.w700,
-                                  color: BODY_TEXT_COLOR,
+                              TextSpan(children: [
+                                TextSpan(
+                                  text: '\n인증중입니다(기다려주세요)             ',
+                                  style: TextStyle(
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.w700,
+                                    color: BODY_TEXT_COLOR,
+                                  ),
+                                  children: [
+                                    WidgetSpan(
+                                      alignment: PlaceholderAlignment.middle,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                    content: Text(
+                                                      '거주지 인증을 정말 취소하시겠습니까?',
+                                                      style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                    ),
+                                                    actions: [
+                                                      Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Container(
+                                                                child:
+                                                                    TextButton(
+                                                                        child:
+                                                                            Text(
+                                                                          '확인',
+                                                                          style: TextStyle(
+                                                                              fontSize: 16.0,
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Colors.black),
+                                                                        ),
+                                                                        onPressed:
+                                                                            () async{
+                                                                          String id = Provider.of<UIDProvider>(context,listen: false).uid;
+                                                                              await deletelocation(id);
+                                                                          await userfetchData(id);
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        })),
+                                                            Container(
+                                                                child:
+                                                                    TextButton(
+                                                                        child:
+                                                                            Text(
+                                                                          '취소',
+                                                                          style: TextStyle(
+                                                                              fontSize: 16.0,
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Colors.black),
+                                                                        ),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        })),
+                                                          ])
+                                                    ]);
+                                              });
+                                        },
+                                        child: Text(
+                                          '취소',
+                                          style: TextStyle(
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.w700,
+                                            color: BODY_TEXT_COLOR,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            if (Provider.of<UIDProvider>(context, listen: false)
-                                        .valid ==
-                                    "ONGOING" &&
-                                Provider.of<UIDProvider>(context, listen: false)
-                                        .location !=
-                                    null)
-                              TextSpan(
-                                text:
-                                    '\n${Provider.of<UIDProvider>(context).location}',
-                                style: TextStyle(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
-                                ),
-                              ),
+                              ]),
+
+                            // if (Provider.of<UIDProvider>(context, listen: false)
+                            //     .valid ==
+                            //     "ONGOING" &&
+                            //     Provider.of<UIDProvider>(context, listen: false)
+                            //         .location !=
+                            //         null)
+                            //   TextSpan(
+                            //     text:
+                            //     '\n${Provider.of<UIDProvider>(context).location}',
+                            //     style: TextStyle(
+                            //       fontSize: 22.0,
+                            //       fontWeight: FontWeight.w700,
+                            //       color: Colors.black,
+                            //     ),
+                            //   ),
                             if (Provider.of<UIDProvider>(context, listen: false)
                                         .valid ==
                                     "CERTIFIED" &&
