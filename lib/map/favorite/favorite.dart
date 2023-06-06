@@ -21,7 +21,7 @@ class favoriteScreen extends StatefulWidget {
 
 class favoriteScreenState extends State<favoriteScreen> {
   bool isLiked = true;
-
+  int sorted = 0;
   Future<String?> favoritePostRequest(
       String uid, String location, double lat, double lng) async {
     final dio = Dio();
@@ -137,6 +137,22 @@ class favoriteScreenState extends State<favoriteScreen> {
           ),
         ),
         foregroundColor: Colors.black,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.sort),
+            tooltip: '정렬하기',
+            onPressed: () {
+    setState(() {
+    if (sorted == 0) {
+    sorted = 1;
+    } else {
+    sorted = 0;
+    }
+    });
+
+            },
+          )
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -170,7 +186,14 @@ class favoriteScreenState extends State<favoriteScreen> {
                         child: ListView.builder(
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
-                              Favorite favorite = snapshot.data![index];
+                              Favorite favorite;
+                              if(sorted==0){
+                              favorite = snapshot.data![index];}
+                              else {
+                                List<Favorite> sortedList = [...snapshot.data!];
+                              sortedList.sort((b, a) => a.totalGrade.compareTo(b.totalGrade));
+                              favorite = sortedList[index];
+                              }
                               return ListTile(
                                 onTap: () {
                                   Navigator.pushReplacement(

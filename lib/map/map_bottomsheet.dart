@@ -6,6 +6,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:like_button/like_button.dart';
 import 'package:oneroom_ex/map/review_detail/review_class.dart';
+import 'package:oneroom_ex/map/sortedProvider.dart';
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
 import 'favorite/favoriteclass.dart';
@@ -260,8 +261,38 @@ class _MyBottomSheetState extends State<MyBottomSheet>
             thickness: 2,
           ),
           SizedBox(height: 10),
-          Text("리뷰",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("리뷰",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Row(children:[
+                if(Provider.of<SortedProvider>(context,listen:false).sorted == 0)
+                Text("최신순",
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                if(Provider.of<SortedProvider>(context,listen:false).sorted == 1)
+                  Text("평점순↑",
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                if(Provider.of<SortedProvider>(context,listen:false).sorted == 2)
+                Text("평점순↓",
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+              IconButton(
+                icon: Icon(Icons.sort),
+                tooltip: '정렬하기',
+                onPressed: () {
+                  setState(() {
+                    if (Provider.of<SortedProvider>(context,listen:false).sorted == 0) {
+                      Provider.of<SortedProvider>(context,listen:false).sort1();
+                    } else if(Provider.of<SortedProvider>(context,listen:false).sorted == 1){
+                      Provider.of<SortedProvider>(context,listen:false).sort2();
+                    }else{
+                      Provider.of<SortedProvider>(context,listen:false).sort0();
+                    }
+                  });
+                },
+              )])
+            ],
+          ),
           SizedBox(
             height: 20,
           ),
@@ -273,11 +304,21 @@ class _MyBottomSheetState extends State<MyBottomSheet>
                   child: ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
-                        Reviewdetail reviews = snapshot.data![index];
+                        Reviewdetail reviews;
+                        if(Provider.of<SortedProvider>(context,listen:false).sorted == 0){
+                          reviews = snapshot.data![index];}
+                        else if(Provider.of<SortedProvider>(context,listen:false).sorted == 1){
+                          List<Reviewdetail> sortedList = [...snapshot.data!];
+                          sortedList.sort((b, a) => (a.grade.lessor+a.grade.area+a.grade.noise+a.grade.quality).compareTo((b.grade.lessor+b.grade.area+b.grade.noise+b.grade.quality)));
+                          reviews = sortedList[index];
+                        }else{
+                          List<Reviewdetail> sortedList = [...snapshot.data!];
+                          sortedList.sort((a, b) => (a.grade.lessor+a.grade.area+a.grade.noise+a.grade.quality).compareTo((b.grade.lessor+b.grade.area+b.grade.noise+b.grade.quality)));
+                          reviews = sortedList[index];
+                        }
                         Body body = reviews.body;
                         Grade grade = reviews.grade;
                         List<Map<String, dynamic>> images = reviews.images;
-
                         return Container(
                           child: ListTile(
                             title: Column(

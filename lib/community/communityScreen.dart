@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_screen.dart';
-import 'package:oneroom_ex/community/TIPS/tipsboard.dart';
+import 'package:oneroom_ex/community/MARKET/market_board_screen.dart';
+import 'package:oneroom_ex/community/communityScreen_search.dart';
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
 import 'GENERAL/general_board_postId.dart';
-import 'MARKET/marketboard.dart';
 import 'package:http/http.dart' as http;
+
+import 'TIPS/tips_board_screen.dart';
 
 class communityScreen extends StatefulWidget {
   const communityScreen({Key? key}) : super(key: key);
@@ -20,7 +22,6 @@ class _communityScreenState extends State<communityScreen> {
   List<dynamic> generalData = [];
   List<dynamic> tipsData = [];
   List<dynamic> marketData = [];
-
 
   @override
   void initState() {
@@ -60,8 +61,41 @@ class _communityScreenState extends State<communityScreen> {
             children: [
               Image.asset(
                 'asset/img/logo/small_logo.png',
-                height: 100,
+                height: 70,
               ),
+
+              //통합 검색
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => communityScreenSearch(),
+                    ),
+                  ) //.then~ //실행 후 게시판을 최신화
+                      .then(
+                        (value) {
+                      setState(
+                            () {
+                          fetchData();
+                        },
+                      );
+                    },
+                  );
+                },
+                icon: Icon(Icons.search, color: Colors.black, size: 26),
+                label: Text(''),
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  minimumSize: Size(double.infinity, 40.0),
+                  // 버튼 세로 크기
+                  alignment: Alignment.centerLeft,
+                  foregroundColor: Colors.black,
+                  side: BorderSide(
+                      color: Colors.black, width: 2.0), // 테두리 선의 색상을 검은색으로 설정
+                ),
+              ),
+
               //자유게시판
               Column(
                 children: [
@@ -77,21 +111,30 @@ class _communityScreenState extends State<communityScreen> {
                         ),
                         child: TextButton.icon(
                           onPressed: () {
-                            Navigator.of(context).push(
+                            Navigator.of(context)
+                                .push(
                               MaterialPageRoute(
-                                builder: (BuildContext context) => GeneralBoardScreen(),
+                                builder: (BuildContext context) =>
+                                    GeneralBoardScreen(),
                               ),
-                            ).then((value) {
-                              setState(() {
-                                fetchData();
-                              });
-                            });
+                            )
+                                .then(
+                              (value) {
+                                setState(
+                                  () {
+                                    fetchData();
+                                  },
+                                );
+                              },
+                            );
                           },
                           icon: Icon(Icons.chat_bubble_outline),
-                          label: Text('자유게시판                                 더보기>'),
+                          label: Text(
+                              '자유게시판                                 더보기>'),
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.black,
-                            textStyle: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w700),
+                            textStyle: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -102,64 +145,78 @@ class _communityScreenState extends State<communityScreen> {
                     children: [
                       for (var item in generalData)
                         GestureDetector(
-                          onTap: Provider.of<UIDProvider>(context, listen: false)
-        .valid !=
-    "CERTIFIED"  ? (){showDialog(
-    context: context,
-    builder: (BuildContext context) {
-    return AlertDialog(
-    content: Text(
-    '거주지 인증을 먼저 완료해주세요!',
-    style: TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.w700,
-    ),
-    ),
-    actions: [
-    Row(
-    mainAxisAlignment:
-    MainAxisAlignment.end,
-    children: [
-    Container(
-    child: TextButton(
-    child: Text(
-    '확인',
-    style: TextStyle(
-    fontSize: 16.0,
-    fontWeight:
-    FontWeight
-        .w700,
-    color: Colors
-        .black),
-    ),
-    onPressed: () {
-    Navigator.pop(
-    context);
-    }))
-    ])
-    ]);
-    }); } :() {
-    Navigator.of(context)
-        .push(
-    MaterialPageRoute(
-    builder: (BuildContext context) => GeneralBoardPostId(
-    item['id']), //id값을 넘김
-    ),
-    )
-        .then((value) {
-    setState(() {
-    fetchData();
-    });
-    });
-    },
+                          onTap: Provider.of<UIDProvider>(context,
+                                          listen: false)
+                                      .valid !=
+                                  "CERTIFIED"
+                              ? () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Text(
+                                          '거주지 인증을 먼저 완료해주세요!',
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Container(
+                                                child: TextButton(
+                                                  child: Text(
+                                                    '확인',
+                                                    style: TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: Colors.black),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              : () {
+                                  Navigator.of(context)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          GeneralBoardPostId(
+                                              item['id']), //id값을 넘김
+                                    ),
+                                  )
+                                      .then(
+                                    (value) {
+                                      setState(
+                                        () {
+                                          fetchData();
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 1.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${item['title']}',
-                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
+                                  '${item['title'].length > 10 ? '${item['title'].substring(0, 10)} ⋯' : item['title']}',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18.0),
                                 ),
                                 Row(
                                   children: [
@@ -197,7 +254,6 @@ class _communityScreenState extends State<communityScreen> {
 
               //자취 꿀팁
               Column(
-
                 children: [
                   Row(
                     children: [
@@ -211,21 +267,30 @@ class _communityScreenState extends State<communityScreen> {
                         ),
                         child: TextButton.icon(
                           onPressed: () {
-                            Navigator.of(context).push(
+                            Navigator.of(context)
+                                .push(
                               MaterialPageRoute(
-                                builder: (BuildContext context) => TipsBoardScreen(),
+                                builder: (BuildContext context) =>
+                                    TipsBoardScreen(),
                               ),
-                            ).then((value) {
-                              setState(() {
-                                fetchData();
-                              });
-                            });
+                            )
+                                .then(
+                              (value) {
+                                setState(
+                                  () {
+                                    fetchData();
+                                  },
+                                );
+                              },
+                            );
                           },
                           icon: Icon(Icons.chat_bubble_outline),
-                          label: Text('자취 꿀팁                                   더보기>'),
+                          label: Text(
+                              '자취 꿀팁                                   더보기>'),
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.black,
-                            textStyle: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w700),
+                            textStyle: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -236,64 +301,74 @@ class _communityScreenState extends State<communityScreen> {
                     children: [
                       for (var item in tipsData)
                         GestureDetector(
-                          onTap: Provider.of<UIDProvider>(context, listen: false)
-                              .valid !=
-                              "CERTIFIED"  ? (){showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                    content: Text(
-                                      '거주지 인증을 먼저 완료해주세요!',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    actions: [
-                                      Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            Container(
+                          onTap: Provider.of<UIDProvider>(context,
+                                          listen: false)
+                                      .valid !=
+                                  "CERTIFIED"
+                              ? () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Text(
+                                          '거주지 인증을 먼저 완료해주세요!',
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Container(
                                                 child: TextButton(
-                                                    child: Text(
-                                                      '확인',
-                                                      style: TextStyle(
-                                                          fontSize: 16.0,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w700,
-                                                          color: Colors
-                                                              .black),
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator.pop(
-                                                          context);
-                                                    }))
-                                          ])
-                                    ]);
-                              }); } :() {
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => GeneralBoardPostId(
-                                    item['id']), //id값을 넘김
-                              ),
-                            )
-                                .then((value) {
-                              setState(() {
-                                fetchData();
-                              });
-                            });
-                          },
+                                                  child: Text(
+                                                    '확인',
+                                                    style: TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: Colors.black),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              : () {
+                                  Navigator.of(context)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          GeneralBoardPostId(
+                                              item['id']), //id값을 넘김
+                                    ),
+                                  )
+                                      .then((value) {
+                                    setState(() {
+                                      fetchData();
+                                    });
+                                  });
+                                },
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 1.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${item['title']}',
-                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
+                                  '${item['title'].length > 10 ? '${item['title'].substring(0, 10)} ⋯' : item['title']}',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18.0),
                                 ),
                                 Row(
                                   children: [
@@ -344,21 +419,26 @@ class _communityScreenState extends State<communityScreen> {
                         ),
                         child: TextButton.icon(
                           onPressed: () {
-                            Navigator.of(context).push(
+                            Navigator.of(context)
+                                .push(
                               MaterialPageRoute(
-                                builder: (BuildContext context) => MarketBoardScreen(),
+                                builder: (BuildContext context) =>
+                                    MarketBoardScreen(),
                               ),
-                            ).then((value) {
+                            )
+                                .then((value) {
                               setState(() {
                                 fetchData();
                               });
                             });
                           },
                           icon: Icon(Icons.chat_bubble_outline),
-                          label: Text('장터게시판                                 더보기>'),
+                          label: Text(
+                              '장터게시판                                 더보기>'),
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.black,
-                            textStyle: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w700),
+                            textStyle: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -369,64 +449,78 @@ class _communityScreenState extends State<communityScreen> {
                     children: [
                       for (var item in marketData)
                         GestureDetector(
-                          onTap: Provider.of<UIDProvider>(context, listen: false)
-                              .valid !=
-                              "CERTIFIED"  ? (){showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                    content: Text(
-                                      '거주지 인증을 먼저 완료해주세요!',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    actions: [
-                                      Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            Container(
+                          onTap: Provider.of<UIDProvider>(context,
+                                          listen: false)
+                                      .valid !=
+                                  "CERTIFIED"
+                              ? () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Text(
+                                          '거주지 인증을 먼저 완료해주세요!',
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Container(
                                                 child: TextButton(
-                                                    child: Text(
-                                                      '확인',
-                                                      style: TextStyle(
-                                                          fontSize: 16.0,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w700,
-                                                          color: Colors
-                                                              .black),
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator.pop(
-                                                          context);
-                                                    }))
-                                          ])
-                                    ]);
-                              }); } :() {
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => GeneralBoardPostId(
-                                    item['id']), //id값을 넘김
-                              ),
-                            )
-                                .then((value) {
-                              setState(() {
-                                fetchData();
-                              });
-                            });
-                          },
+                                                  child: Text(
+                                                    '확인',
+                                                    style: TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: Colors.black),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              : () {
+                                  Navigator.of(context)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          GeneralBoardPostId(
+                                              item['id']), //id값을 넘김
+                                    ),
+                                  )
+                                      .then(
+                                    (value) {
+                                      setState(
+                                        () {
+                                          fetchData();
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 1.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 1.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${item['title']}',
-                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
+                                  '${item['title'].length > 10 ? '${item['title'].substring(0, 10)} ⋯' : item['title']}',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18.0),
                                 ),
                                 Row(
                                   children: [

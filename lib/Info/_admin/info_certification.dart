@@ -121,9 +121,10 @@ class _CertificationScreenState extends State<CertificationScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                '계약서를 첨부해야만 리뷰등록이 가능합니다.'
-                '\n계약서는 거주지 인증 용도로만 사용됩니다'
-                '\n인증까지 최대 3일까지 시간이 소요될 수 있습니다.',
+                '           계약서 또는 지로공과금 청구서를 첨부하세요.'
+          '        \n               (주소 및 이름을 포함해서 제출해주세요)'
+                '\n        임대차 계약서 첨부시 본인의 정보만 첨부하세요.',
+
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.w700,

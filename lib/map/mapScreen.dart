@@ -206,6 +206,11 @@ class _mapScreenState extends State<mapScreen>
     _location = widget.location;
     _latitude = widget.latitude;
     _longitude = widget.longitude;
+
+    if(35>_latitude|| _latitude>35.5 || 128>_longitude|| _longitude>128.9){
+      _latitude =35.156678;
+      _longitude =128.104985;
+    }
   }
 
   @override
@@ -458,6 +463,7 @@ class _mapScreenState extends State<mapScreen>
                               map_showDialog(data.id.toString());
                               break;
                             }
+                            break;
                           }}
                           ;
                         });
@@ -852,7 +858,7 @@ class _mapScreenState extends State<mapScreen>
                                       ),
                                       SizedBox(width: 10),
                                       Text(
-                                        '${NumberFormat("#.#").format(data.totalgrade/(4 * data.reviewCount))}',
+                                        '${NumberFormat("#.#").format(data.totalgrade/4)}',
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold),

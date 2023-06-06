@@ -222,7 +222,7 @@ class _Reviewmodify2State extends State<Reviewmodify2> {
               backgroundColor: Colors.white,
               elevation: 1,
               title: Text(
-                '리뷰 작성(2/2)',
+                '리뷰 수정(2/2)',
                 style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.w700,

@@ -351,13 +351,6 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                               );
                                             } else {
                                               postLike();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content:
-                                                      Text('이 글을 공감하셨습니다.'),
-                                                ),
-                                              );
                                             }
                                           },
                                           icon: Icon(
@@ -629,14 +622,6 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                                         );
                                                       } else {
                                                         commentLike(commentId);
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                                '이 댓글을 공감하셨습니다.'),
-                                                          ),
-                                                        );
                                                       }
                                                     },
                                                     icon: Icon(
