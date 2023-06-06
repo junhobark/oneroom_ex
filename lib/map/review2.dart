@@ -412,41 +412,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                 Provider.of<REVIEWProvider>(context,
                                         listen: false)
                                     .setall(0, 0, 0, 0);
-                                // showDialog(
-                                //     context: context,
-                                //     builder: (BuildContext context) {
-                                //       return AlertDialog(
-                                //           content: Text(
-                                //             '이제 커뮤니티 이용이 가능합니다!',
-                                //             style: TextStyle(
-                                //               fontSize: 22,
-                                //               fontWeight: FontWeight.w700,
-                                //             ),
-                                //           ),
-                                //           actions: [
-                                //             Row(
-                                //                 mainAxisAlignment:
-                                //                     MainAxisAlignment.end,
-                                //                 children: [
-                                //                   Container(
-                                //                       child: TextButton(
-                                //                           child: Text(
-                                //                             '확인',
-                                //                             style: TextStyle(
-                                //                                 fontSize: 16.0,
-                                //                                 fontWeight:
-                                //                                     FontWeight
-                                //                                         .w700,
-                                //                                 color: Colors
-                                //                                     .black),
-                                //                           ),
-                                //                           onPressed: () {
-                                //                             Navigator.pop(
-                                //                                 context);
-                                //                           }))
-                                //                 ])
-                                //           ]);
-                                //     });
+
                               }
                             },
                       style: ElevatedButton.styleFrom(

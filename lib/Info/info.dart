@@ -62,9 +62,61 @@ class _informationScreen extends State<informationScreen> {
           ),
         ),
         onPressed: () {
-          _signOut();
-          _authentication.signOut();
-          Navigator.pop(context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                    content: Text(
+                      '로그아웃 하시겠습니까?',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    actions: [
+                      Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.end,
+                          children: [
+                            Container(
+                                child: TextButton(
+                                    child: Text(
+                                      '네',
+                                      style: TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w700,
+                                          color: Colors
+                                              .black),
+                                    ),
+                                    onPressed: () {
+                                      _signOut();
+                                      _authentication.signOut();
+                                      Navigator.pop(context);
+                                      Navigator.pop(
+                                          context);
+
+                                    })),
+                            Container(
+                                child: TextButton(
+                                    child: Text(
+                                      '아니요',
+                                      style: TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight:
+                                          FontWeight
+                                              .w700,
+                                          color: Colors
+                                              .black),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context);
+                                    }))
+                          ])
+                    ]);
+              });
         },
         child: Text('로그아웃'),
       ),
