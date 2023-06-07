@@ -266,7 +266,7 @@ class _CertificationScreenState extends State<CertificationScreen> {
           content: Text(
             '제출하실건가요?',
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
           ),

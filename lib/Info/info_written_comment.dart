@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:oneroom_ex/common/colors.dart';
+import 'package:oneroom_ex/common/default_layout.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_postId.dart';
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
@@ -40,21 +41,9 @@ class _WrittenCommentScreenState extends State<WrittenCommentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        title: Text(
-          '내가 쓴 댓글',
-          style: TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-
-      body: Container(
+    return DefaultLayout(
+     title:'내가 쓴 댓글',
+      child: Container(
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),

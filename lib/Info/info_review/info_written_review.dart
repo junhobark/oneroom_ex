@@ -348,7 +348,7 @@ class _WrittenReviewScreenState extends State<WrittenReviewScreen> {
                     children: [
                       Center(
                           child: Text(
-                        '내가 쓴 리뷰가 없어요',
+                        '',
                         style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.w700,

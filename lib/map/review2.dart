@@ -348,7 +348,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                           content: Text(
                                             '사진은 최대 5장까지만 가능합니다',
                                             style: TextStyle(
-                                              fontSize: 22,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),

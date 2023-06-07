@@ -8,6 +8,7 @@ import 'package:oneroom_ex/community/MARKET/market_board_postId.dart';
 import 'package:oneroom_ex/community/TIPS/tips_board_postId.dart';
 import 'package:provider/provider.dart';
 import '../../login/uid_provider.dart';
+import '../common/default_layout.dart';
 
 class WrittenBoardScreen extends StatefulWidget {
   const WrittenBoardScreen({Key? key}) : super(key: key);
@@ -82,20 +83,9 @@ class _WrittenBoardScreenState extends State<WrittenBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        title: Text(
-          '내가 쓴 글',
-          style: TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-      body: Container(
+    return DefaultLayout(
+      title:'내가 쓴 글',
+      child: Container(
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),

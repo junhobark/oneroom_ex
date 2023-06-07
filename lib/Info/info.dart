@@ -69,7 +69,7 @@ class _informationScreen extends State<informationScreen> {
                     content: Text(
                       '로그아웃 하시겠습니까?',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -264,7 +264,7 @@ class _informationScreen extends State<informationScreen> {
                                                     content: Text(
                                                       '거주지 인증을 정말 취소하시겠습니까?',
                                                       style: TextStyle(
-                                                        fontSize: 22,
+                                                        fontSize: 18,
                                                         fontWeight:
                                                             FontWeight.w700,
                                                       ),
