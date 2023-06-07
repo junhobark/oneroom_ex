@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/common/default_layout.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_postId.dart';
+import 'package:oneroom_ex/community/MARKET/market_board_postId.dart';
+import 'package:oneroom_ex/community/TIPS/tips_board_postId.dart';
 
 class communityScreenSearch extends StatefulWidget {
   const communityScreenSearch({Key? key}) : super(key: key);
@@ -113,21 +115,45 @@ class _communityScreenSearchState extends State<communityScreenSearch> {
                             ),
                           ),
                         ),
-
-                        //일반글
                         child: ListTile(
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    GeneralBoardPostId(
-                                        searchData[index]['id']), //id값을 넘김
-                              ),
-                            ).then((value) {
-                              setState(() {
-                                fetchData();
+                            if (searchData[index]['category'] == "GENERAL") {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      GeneralBoardPostId(
+                                          searchData[index]['id']), //id값을 넘김
+                                ),
+                              ).then((value) {
+                                setState(() {
+                                  fetchData();
+                                });
                               });
-                            });
+                            } else if (searchData[index]['category'] == "MARKET") {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      MarketBoardPostId(
+                                          searchData[index]['id']), //id값을 넘김
+                                ),
+                              ).then((value) {
+                                setState(() {
+                                  fetchData();
+                                });
+                              });
+                            } else if (searchData[index]['category'] == "TIPS") {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      TipsBoardPostId(
+                                          searchData[index]['id']), //id값을 넘김
+                                ),
+                              ).then((value) {
+                                setState(() {
+                                  fetchData();
+                                });
+                              });
+                            }
                           },
                           title: Text(
                             '${searchData[index]['title'].length > 15 ? '${searchData[index]['title'].substring(0, 15)} ⋯' : searchData[index]['title']}',

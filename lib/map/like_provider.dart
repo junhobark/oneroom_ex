@@ -6,16 +6,16 @@ class LikeProvider extends ChangeNotifier {
 
   void toggleLike() {
     isLiked = !isLiked;
-    notifyListeners;
+    notifyListeners();
   }
 
   void Liketrue() {
     isLiked = true;
-    notifyListeners;
+    notifyListeners();
   }
 
   void Likefalse() {
     isLiked = false;
-    notifyListeners;
+    notifyListeners();
   }
 }

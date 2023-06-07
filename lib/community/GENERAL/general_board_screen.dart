@@ -380,7 +380,7 @@ class _GeneralBoardScreenState extends State<GeneralBoardScreen> {
                                     content: Text(
                                       '거주지 인증을 먼저 완료해주세요!',
                                       style: TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),

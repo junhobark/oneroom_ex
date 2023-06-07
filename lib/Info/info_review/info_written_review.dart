@@ -246,17 +246,70 @@ class _WrittenReviewScreenState extends State<WrittenReviewScreen> {
                                           width: 10,
                                         ),
                                         TextButton(
-                                          onPressed: () async {
-                                            await myreviewDeleteRequest(
-                                                reviews.location, reviews.id);
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        WrittenReviewScreen(),
-                                              ),
-                                            );
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                      content: Text(
+                                                        '이 리뷰를 삭제하시겠습니까?',
+                                                        style: TextStyle(
+                                                          fontSize: 22,
+                                                          fontWeight: FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                      actions: [
+                                                        Row(
+                                                            mainAxisAlignment:
+                                                            MainAxisAlignment.end,
+                                                            children: [
+                                                              Container(
+                                                                  child: TextButton(
+                                                                      child: Text(
+                                                                        '네',
+                                                                        style: TextStyle(
+                                                                            fontSize: 16.0,
+                                                                            fontWeight:
+                                                                            FontWeight
+                                                                                .w700,
+                                                                            color: Colors
+                                                                                .black),
+                                                                      ),
+                                                                      onPressed: () async{
+
+                                                                        Navigator.pop(context);
+                                                                        await myreviewDeleteRequest(
+                                                                        reviews.location, reviews.id);
+                                                                        Navigator.pushReplacement(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                            builder:
+                                                                                (BuildContext context) =>
+                                                                                WrittenReviewScreen(),
+                                                                          ),
+                                                                        );
+
+                                                                      })),
+                                                              Container(
+                                                                  child: TextButton(
+                                                                      child: Text(
+                                                                        '아니요',
+                                                                        style: TextStyle(
+                                                                            fontSize: 16.0,
+                                                                            fontWeight:
+                                                                            FontWeight
+                                                                                .w700,
+                                                                            color: Colors
+                                                                                .black),
+                                                                      ),
+                                                                      onPressed: () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      }))
+                                                            ])
+                                                      ]);
+                                                });
+
                                           },
                                           child: Text(
                                             '삭제',

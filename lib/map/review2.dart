@@ -387,13 +387,6 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                                             listen: false)
                                         .uid);
                                 print(widget.review_lat);
-                                Provider.of<LocationProvider>(context,
-                                        listen: false)
-                                    .setlocation(
-                                        widget.review_lat,
-                                        widget.review_lng,
-                                        widget.roadaddress,
-                                        1);
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                                 Navigator.pushReplacement(

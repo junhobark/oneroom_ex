@@ -4,8 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:oneroom_ex/common/colors.dart';
 import 'package:oneroom_ex/community/GENERAL/general_board_postId.dart';
+import 'package:oneroom_ex/community/MARKET/market_board_postId.dart';
+import 'package:oneroom_ex/community/TIPS/tips_board_postId.dart';
 import 'package:provider/provider.dart';
-import '../login/uid_provider.dart';
+import '../../login/uid_provider.dart';
 
 class WrittenBoardScreen extends StatefulWidget {
   const WrittenBoardScreen({Key? key}) : super(key: key);
@@ -24,17 +26,57 @@ class _WrittenBoardScreenState extends State<WrittenBoardScreen> {
   }
 
   Future<void> fetchPosts() async {
-    //final url = Uri.parse('http://10.0.2.2:8080/user/abc/post');
-    final url = Uri.parse('http://10.0.2.2:8080/user/${Provider.of<UIDProvider>(context, listen: false).uid}/post');
+    final url = Uri.parse(
+        'http://10.0.2.2:8080/user/${Provider.of<UIDProvider>(context, listen: false).uid}/post');
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      final data = utf8.decode(response.bodyBytes); // UTF-8로 디코딩
+      final data = utf8.decode(response.bodyBytes);
 
       setState(() {
         posts = json.decode(data);
       });
     } else {
       print('Failed to fetch posts. Error: ${response.statusCode}');
+    }
+  }
+
+  void navigateToPostScreen(dynamic post) {
+    if (post['category'] == 'GENERAL') {
+      Navigator.of(context)
+          .push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => GeneralBoardPostId(post['id']),
+        ),
+      )
+          .then((value) {
+        setState(() {
+          fetchPosts();
+        });
+      });
+    } else if (post['category'] == 'MARKET') {
+      Navigator.of(context)
+          .push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => MarketBoardPostId(post['id']),
+        ),
+      )
+          .then((value) {
+        setState(() {
+          fetchPosts();
+        });
+      });
+    } else if (post['category'] == 'TIPS') {
+      Navigator.of(context)
+          .push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => TipsBoardPostId(post['id']),
+        ),
+      )
+          .then((value) {
+        setState(() {
+          fetchPosts();
+        });
+      });
     }
   }
 
@@ -53,7 +95,6 @@ class _WrittenBoardScreenState extends State<WrittenBoardScreen> {
           ),
         ),
       ),
-
       body: Container(
         color: Colors.white,
         child: Padding(
@@ -75,16 +116,7 @@ class _WrittenBoardScreenState extends State<WrittenBoardScreen> {
                 ),
                 child: ListTile(
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            GeneralBoardPostId(post['id']), //id값을 넘김
-                      ),
-                    ).then((value) {
-                      setState(() {
-                        fetchPosts();
-                      });
-                    });
+                    navigateToPostScreen(post);
                   },
                   title: Text(
                     '${post['title'].length > 20 ? '${post['title'].substring(0, 18)} ⋯' : post['title']}',
@@ -156,7 +188,8 @@ class _WrittenBoardScreenState extends State<WrittenBoardScreen> {
                             ],
                           ),
                           Text(
-                            DateFormat('HH:mm').format(DateTime.parse(post['createdAt'])),
+                            DateFormat('HH:mm')
+                                .format(DateTime.parse(post['createdAt'])),
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 16.0,

@@ -11,11 +11,12 @@ import 'package:oneroom_ex/map/review1.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:like_button/like_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:oneroom_ex/map/sortedProvider.dart';
 import 'package:provider/provider.dart';
 import '../login/uid_provider.dart';
 import 'favorite/favoriteclass.dart';
-import 'locationProvider.dart';
-import 'map_bottomsheet.dart';
+import 'review_detail/bodyclass.dart';
+import 'review_detail/gradeclass.dart';
 import 'review_detail/review_class.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -67,6 +68,19 @@ class _mapScreenState extends State<mapScreen>
     } else {
       // 요청이 실패한 경우 예외 처리
       throw Exception('Failed to load building list');
+    }
+  }
+  Future<List<Reviewdetail>> reviewfetchData(String location) async {
+    final response = await http
+        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/review'));
+    if (response.statusCode == 200) {
+      print('응답했다2');
+      final datadetail =
+      jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+
+      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
+    } else {
+      throw Exception('Error: ${response.statusCode}');
     }
   }
 
@@ -165,19 +179,6 @@ class _mapScreenState extends State<mapScreen>
     }
   }
 
-  Future<List<Reviewdetail>> reviewfetchData(location) async {
-    final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/map/${location}/review'));
-    if (response.statusCode == 200) {
-      print('응답했다2');
-      final datadetail =
-          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
-      return datadetail.map((item) => Reviewdetail.fromJson(item)).toList();
-    } else {
-      throw Exception('Error: ${response.statusCode}');
-    }
-  }
-
   late KakaoMapController mapController;
   int currentLevel = 0;
   List<Marker> markers = [];
@@ -245,7 +246,7 @@ class _mapScreenState extends State<mapScreen>
                           });
                         });
                         islike(_location);
-                        Future.delayed(Duration(milliseconds: 250), () {
+                        Future.delayed(Duration(milliseconds: 300), () {
                           map_showDialog(data.id.toString());
                         });
                         en = 1;
@@ -262,7 +263,7 @@ class _mapScreenState extends State<mapScreen>
                           favorite = data!;
                         });
                         islike(_location);
-                        Future.delayed(Duration(milliseconds: 250), () {
+                        Future.delayed(Duration(milliseconds: 300), () {
                           map_showDialog('maId');
                         });
                       });
@@ -303,7 +304,7 @@ class _mapScreenState extends State<mapScreen>
                     mapmarkers = data;
                   });
                 });
-                map_showDialog(markerId);
+               map_showDialog(markerId);
               },
               center: LatLng(_latitude, _longitude)),
           Positioned(
@@ -384,7 +385,8 @@ class _mapScreenState extends State<mapScreen>
                 child: IconButton(
                   onPressed:
     Provider.of<UIDProvider>(context, listen: false).location ==null?
-    ()  {showDialog(
+    ()  {
+                    showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -418,59 +420,14 @@ class _mapScreenState extends State<mapScreen>
                               }))
                     ])
               ]);
-        });  }: (){
+        });  }
+        : (){
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) {
                         return const ReviewScreen1();
                       }),
-                    ).then((value) {
-                      if (Provider.of<LocationProvider>(context, listen: false)
-                              .cnt ==
-                          1) {
-                        setState(() {
-                          sendGetmarkerFormData(
-                                  Provider.of<LocationProvider>(context,
-                                          listen: false)
-                                      .lat,
-                                  Provider.of<LocationProvider>(context,
-                                          listen: false)
-                                      .lng)
-                              .then((data) {
-                            setState(() {
-                              mapmarkers = data;
-                            });
-                          });
-                          if(currentLevel>1)
-                            currentLevel = 1;
-                          mapController.setLevel(currentLevel);
-                          if(  Provider.of<LocationProvider>(context,
-                              listen: false)
-                              .lat != 0)
-                        {  mapController.panTo(LatLng(
-                              Provider.of<LocationProvider>(context,
-                                      listen: false)
-                                  .lat,
-                              Provider.of<LocationProvider>(context,
-                                      listen: false)
-                                  .lng));
-
-                          for (var data in mapmarkers) {
-                            if (data.location ==
-                                Provider.of<LocationProvider>(context,
-                                        listen: false)
-                                    .loca) {
-                              map_showDialog(data.id.toString());
-                              break;
-                            }
-                            break;
-                          }}
-                          ;
-                        });
-                        Provider.of<LocationProvider>(context, listen: false)
-                            .setlocation(0, 0, '', 1);
-                      }
-                    });
+                    );
                   },
                   icon: const Icon(
                     Icons.rate_review,
@@ -549,247 +506,252 @@ class _mapScreenState extends State<mapScreen>
     favoritefetchData().then((data) {
       setState(() {
         favorite = data!;
+        islike(roadaddress);
       });
     });
-    islike(roadaddress);
+
     if (markerId == 'markerId') {
-      Future.delayed(Duration(milliseconds: 250), () {
+      Future.delayed(Duration(milliseconds: 300), (){
         showDialog(
           context: context,
           barrierDismissible: true,
           barrierColor: Colors.white.withOpacity(0.0),
           builder: (BuildContext context) {
-            return Stack(children: [
-              Positioned(
-                top: MediaQuery.of(context).size.height - 250,
-                child: AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  content: SizedOverflowBox(
-                    size: const Size(280, 70),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("${removeaddress}",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              Row(
-                                children: [
-                                  LikeButton(
-                                    isLiked: Provider.of<LikeProvider>(context,
-                                                    listen: false)
-                                                .isLiked ==
-                                            true
-                                        ? true
-                                        : false,
-                                    likeBuilder: (bool isLiked) {
-                                      return Icon(
-                                        Icons.favorite,
-                                        color:
-                                            isLiked ? Colors.red : Colors.grey,
-                                        size: 20,
-                                      );
-                                    },
-                                    onTap: (isLiked) => onLikeButtonTapped(
-                                        Provider.of<LikeProvider>(context,
-                                                listen: false)
-                                            .isLiked,
-                                        roadaddress,
-                                        kakaoLatitude,
-                                        kakaoLongitude),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    '0.0',
+            return GestureDetector(
+              onTap: () {
+                islike(roadaddress);
+                Navigator.of(context).pop();
+              },
+              child: Stack(children: [
+                Positioned(
+                  top: MediaQuery.of(context).size.height - 250,
+                  child: AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    content: SizedOverflowBox(
+                      size: const Size(280, 70),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${removeaddress}",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                     style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    '(리뷰 0)',
-                                    style: TextStyle(fontSize: 10),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("${roadaddress}",
-                                  style: TextStyle(fontSize: 12)),
-                              RatingBarIndicator(
-                                rating: 0,
-                                itemBuilder: (context, index) => Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                Row(
+                                  children: [
+                                    Consumer<LikeProvider>(
+                                      builder: (context, likeProvider, _) => LikeButton(
+                                        isLiked: likeProvider.isLiked,
+                                        likeBuilder: (bool isLiked) {
+                                          return Icon(
+                                            Icons.favorite,
+                                            color: isLiked ? Colors.red : Colors.grey,
+                                            size: 20,
+                                          );
+                                        },
+                                        onTap: (isLiked) => onLikeButtonTapped(
+                                          likeProvider.isLiked,
+                                          roadaddress,
+                                          kakaoLatitude,
+                                          kakaoLongitude,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      '0.0',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      '(리뷰 0)',
+                                      style: TextStyle(fontSize: 10),
+                                    )
+                                  ],
                                 ),
-                                itemCount: 5,
-                                itemSize: 12.0,
-                                direction: Axis.horizontal,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(""),
-                              GestureDetector(
-                                onTap: () {
-                                  bottom_sheet('markerId');
-                                },
-                                child: Row(children: [
-                                  Text("리뷰보기", style: TextStyle(fontSize: 10)),
-                                  Icon(
-                                    Icons.chevron_right,
-                                    size: 10,
-                                  )
-                                ]),
-                              )
-                            ],
-                          )
-                        ]),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${roadaddress}",
+                                    style: TextStyle(fontSize: 12)),
+                                RatingBarIndicator(
+                                  rating: 0,
+                                  itemBuilder: (context, index) => Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                                  itemCount: 5,
+                                  itemSize: 12.0,
+                                  direction: Axis.horizontal,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(""),
+                                GestureDetector(
+                                  onTap: () {
+                                    bottom_sheet('markerId');
+                                  },
+                                  child: Row(children: [
+                                    Text("리뷰보기", style: TextStyle(fontSize: 10)),
+                                    Icon(
+                                      Icons.chevron_right,
+                                      size: 10,
+                                    )
+                                  ]),
+                                )
+                              ],
+                            )
+                          ]),
+                    ),
                   ),
-                ),
-              )
-            ]);
+                )
+              ]),
+            );
           },
         );
       });
     } else if (markerId == 'maId') {
+
       favoritefetchData().then((data) {
         setState(() {
           favorite = data!;
+          islike(_location);
         });
       });
-      islike(_location);
-      Future.delayed(Duration(milliseconds: 250), () {
+
+      Future.delayed(Duration(milliseconds: 300), () {
         showDialog(
           context: context,
           barrierDismissible: true,
           barrierColor: Colors.white.withOpacity(0.0),
           builder: (BuildContext context) {
-            return Stack(children: [
-              Positioned(
-                top: MediaQuery.of(context).size.height - 250,
-                child: AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  content: SizedOverflowBox(
-                    size: const Size(280, 70),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("${_location.replaceFirst('경남 진주시 ', '')}",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              Row(
-                                children: [
-                                  LikeButton(
-                                    isLiked: Provider.of<LikeProvider>(context,
-                                                    listen: false)
-                                                .isLiked ==
-                                            true
-                                        ? true
-                                        : false,
-                                    likeBuilder: (bool isLiked) {
-                                      return Icon(
-                                        Icons.favorite,
-                                        color:
-                                            isLiked ? Colors.red : Colors.grey,
-                                        size: 20,
-                                      );
-                                    },
-                                    onTap: (isLiked) => onLikeButtonTapped(
-                                        Provider.of<LikeProvider>(context,
-                                                listen: false)
-                                            .isLiked,
-                                        roadaddress,
-                                        kakaoLatitude,
-                                        kakaoLongitude),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    '0.0',
+            return GestureDetector(
+              onTap: (){
+                islike(_location);
+                Navigator.of(context).pop();
+              },
+              child: Stack(children: [
+                Positioned(
+                  top: MediaQuery.of(context).size.height - 250,
+                  child: AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    content: SizedOverflowBox(
+                      size: const Size(280, 70),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${_location.replaceFirst('경남 진주시 ', '')}",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                     style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    '(리뷰 0)',
-                                    style: TextStyle(fontSize: 10),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("${_location}",
-                                  style: TextStyle(fontSize: 12)),
-                              RatingBarIndicator(
-                                rating: 0,
-                                itemBuilder: (context, index) => Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                Row(
+                                  children: [
+                                    Consumer<LikeProvider>(
+                                      builder: (context, likeProvider, _) => LikeButton(
+                                        isLiked: likeProvider.isLiked ,
+                                        likeBuilder: (bool isLiked) {
+                                          return Icon(
+                                            Icons.favorite,
+                                            color: isLiked ? Colors.red : Colors.grey,
+                                            size: 20,
+                                          );
+                                        },
+                                        onTap: (isLiked) => onLikeButtonTapped(
+                                          likeProvider.isLiked,
+                                          _location,
+                                          kakaoLatitude,
+                                          kakaoLongitude,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      '0.0',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      '(리뷰 0)',
+                                      style: TextStyle(fontSize: 10),
+                                    )
+                                  ],
                                 ),
-                                itemCount: 5,
-                                itemSize: 12.0,
-                                direction: Axis.horizontal,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(""),
-                              GestureDetector(
-                                onTap: () {
-                                  bottom_sheet('maId');
-                                },
-                                child: Row(children: [
-                                  Text("리뷰보기", style: TextStyle(fontSize: 10)),
-                                  Icon(
-                                    Icons.chevron_right,
-                                    size: 10,
-                                  )
-                                ]),
-                              )
-                            ],
-                          )
-                        ]),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${_location}",
+                                    style: TextStyle(fontSize: 12)),
+                                RatingBarIndicator(
+                                  rating: 0,
+                                  itemBuilder: (context, index) => Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                                  itemCount: 5,
+                                  itemSize: 12.0,
+                                  direction: Axis.horizontal,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(""),
+                                GestureDetector(
+                                  onTap: () {
+                                    bottom_sheet('maId');
+                                  },
+                                  child: Row(children: [
+                                    Text("리뷰보기", style: TextStyle(fontSize: 10)),
+                                    Icon(
+                                      Icons.chevron_right,
+                                      size: 10,
+                                    )
+                                  ]),
+                                )
+                              ],
+                            )
+                          ]),
+                    ),
                   ),
-                ),
-              )
-            ]);
+                )
+              ]),
+            );
           },
         );
       });
     } else {
-      for (var data in mapmarkers) {
-        if (data.id.toString() == markerId) {
-          reviewfetchData(data.location).then((data) {
+      for (var data1 in mapmarkers) {
+        if (data1.id.toString() == markerId) {
+          reviewfetchData(data1.location).then((data) {
             setState(() {
               reviews = data;
             });
@@ -797,131 +759,131 @@ class _mapScreenState extends State<mapScreen>
           favoritefetchData().then((data) {
             setState(() {
               favorite = data!;
+              islike(data1.location);
             });
           });
-          islike(data.location);
-          var location = data.location;
-          Future.delayed(Duration(milliseconds: 250), (){
+
+          var location = data1.location;
+          Future.delayed(Duration(milliseconds: 300), (){
             showDialog(
               context: context,
               barrierDismissible: true,
               barrierColor: Colors.white.withOpacity(0.0),
               builder: (BuildContext context) {
-                return Stack(children: [
-                  Positioned(
-                    top: MediaQuery.of(context).size.height - 250,
-                    child: AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: SizedOverflowBox(
-                        size: const Size(280, 70),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                      "${data.location.replaceFirst('경남 진주시 ', '')}",
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  Row(
-                                    children: [
-                                      LikeButton(
-                                        isLiked: Provider.of<LikeProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .isLiked ==
-                                                true
-                                            ? true
-                                            : false,
-                                        likeBuilder: (bool isLiked) {
-                                          return Icon(
-                                            Icons.favorite,
-                                            color: isLiked
-                                                ? Colors.red
-                                                : Colors.grey,
-                                            size: 20,
-                                          );
-                                        },
-                                        onTap: (isLiked) => onLikeButtonTapped(
-                                            Provider.of<LikeProvider>(context,
-                                                    listen: false)
-                                                .isLiked,
-                                            data.location,
-                                            data.posx,
-                                            data.posy),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        '${NumberFormat("#.#").format(data.totalgrade/4)}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Text(
-                                        '(리뷰 ${data.reviewCount})',
-                                        style: TextStyle(fontSize: 10),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${data.location}",
-                                      style: TextStyle(fontSize: 12)),
-                                  RatingBarIndicator(
-                                    rating: data.totalgrade / (4 *data.reviewCount),
-                                    itemBuilder: (context, index) => Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    itemCount: 5,
-                                    itemSize: 12.0,
-                                    direction: Axis.horizontal,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
+                return GestureDetector(
+                  onTap: (){
+                    islike(data1.location);
+                    Navigator.of(context).pop();
+                  },
+                  child: Stack(children: [
+                    Positioned(
+                      top: MediaQuery.of(context).size.height - 250,
+                      child: AlertDialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: SizedOverflowBox(
+                          size: const Size(280, 70),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "",
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        bottom_sheetdata(
-                                            location, data.posx, data.posy);
-                                      },
-                                      child: Row(children: [
-                                        Text("리뷰보기",
-                                            style: TextStyle(fontSize: 10)),
-                                        Icon(
-                                          Icons.chevron_right,
-                                          size: 10,
+                                        "${data1.location.replaceFirst('경남 진주시 ', '')}",
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                    Row(
+                                      children: [
+                                        Consumer<LikeProvider>(
+                                          builder: (context, likeProvider, _) => LikeButton(
+                                            isLiked: likeProvider.isLiked ,
+                                            likeBuilder: (bool isLiked) {
+                                              return Icon(
+                                                Icons.favorite,
+                                                color: isLiked ? Colors.red : Colors.grey,
+                                                size: 20,
+                                              );
+                                            },
+                                            onTap: (isLiked) => onLikeButtonTapped(
+                                              likeProvider.isLiked,
+                                              data1.location,
+                                              data1.posx,
+                                              data1.posy,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          '${NumberFormat("#.#").format(data1.totalgrade/4)}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                          '(리뷰 ${data1.reviewCount})',
+                                          style: TextStyle(fontSize: 10),
                                         )
-                                      ]),
-                                    )
-                                  ])
-                            ]),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("${data1.location}",
+                                        style: TextStyle(fontSize: 12)),
+                                    RatingBarIndicator(
+                                      rating: data1.totalgrade/4,
+                                      itemBuilder: (context, index) => Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      itemCount: 5,
+                                      itemSize: 12.0,
+                                      direction: Axis.horizontal,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "",
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          bottom_sheetdata(
+                                              location, data1.posx, data1.posy,data1.totalgrade,data1.reviewCount);
+                                        },
+                                        child: Row(children: [
+                                          Text("리뷰보기",
+                                              style: TextStyle(fontSize: 10)),
+                                          Icon(
+                                            Icons.chevron_right,
+                                            size: 10,
+                                          )
+                                        ]),
+                                      )
+                                    ])
+                              ]),
+                        ),
                       ),
-                    ),
-                  )
-                ]);
+                    )
+                  ]),
+                );
               },
             );
           });
@@ -930,25 +892,9 @@ class _mapScreenState extends State<mapScreen>
     }
   }
 
-  Future<bool> onLikeButtonTapped(
-      bool isLiked, String location, double lat, double lng) async {
-    if (isLiked) {
-      // 좋아요 취소를 위해 DELETE 요청 보내기
-      favoriteDeleteRequest(
-          Provider.of<UIDProvider>(context, listen: false).uid, location);
-    } else {
-      // 좋아요 추가를 위해 POST 요청 보내기
-      favoritePostRequest(Provider.of<UIDProvider>(context, listen: false).uid,
-          location, lat, lng);
-    }
 
-    // isLiked 값 반전시키기
-    isLiked = !isLiked;
-    Provider.of<LikeProvider>(context, listen: false).toggleLike();
-    return isLiked;
-  }
 
-  bottom_sheetdata(String location, double lat, double lng) {
+  bottom_sheetdata(String location, double lat, double lng, double totalgrade, int reviewcount) {
     showModalBottomSheet(
       barrierColor: Colors.white.withOpacity(0.0),
       isScrollControlled: true,
@@ -962,7 +908,291 @@ class _mapScreenState extends State<mapScreen>
       builder: (BuildContext context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.75, // 원하는 높이로 조절합니다.
-          child: MyBottomSheet(location, lat, lng),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${location.replaceFirst('경남 진주시 ', '')}",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        Consumer<LikeProvider>(
+                          builder: (context, likeProvider, _) => LikeButton(
+                            isLiked: likeProvider.isLiked,
+                            likeBuilder: (bool isLiked) {
+                              return Icon(
+                                Icons.favorite,
+                                color: isLiked ? Colors.red : Colors.grey,
+                                size: 20,
+                              );
+                            },
+                            onTap: (isLiked) => onLikeButtonTapped(
+                              likeProvider.isLiked,
+                              location,
+                              lat,
+                              lng,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        Text(
+                          '${NumberFormat("#.#").format(totalgrade/ 4)}',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          '(리뷰 ${reviewcount})',
+                          style: TextStyle(fontSize: 12),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${location}", style: TextStyle(fontSize: 12)),
+                    RatingBarIndicator(
+                      rating: totalgrade/ 4,
+                      itemBuilder: (context, index) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      itemCount: 5,
+                      itemSize: 17.0,
+                      direction: Axis.horizontal,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Divider(
+                  color: Colors.grey,
+                  thickness: 2,
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("리뷰",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Row(children:[
+                      if(Provider.of<SortedProvider>(context,listen:false).sorted == 0)
+                        Text("최신순",
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                      if(Provider.of<SortedProvider>(context,listen:false).sorted == 1)
+                        Text("평점순↑",
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                      if(Provider.of<SortedProvider>(context,listen:false).sorted == 2)
+                        Text("평점순↓",
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: Icon(Icons.sort),
+                        tooltip: '정렬하기',
+                        onPressed: () {
+                          setState(() {
+                            if (Provider.of<SortedProvider>(context,listen:false).sorted == 0) {
+                              Provider.of<SortedProvider>(context,listen:false).sort1();
+                            } else if(Provider.of<SortedProvider>(context,listen:false).sorted == 1){
+                              Provider.of<SortedProvider>(context,listen:false).sort2();
+                            }else{
+                              Provider.of<SortedProvider>(context,listen:false).sort0();
+                            }
+                          });
+                        },
+                      )])
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                FutureBuilder<List<Reviewdetail>>(
+                  future: reviewfetchData(location),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Expanded(
+                        child: ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              Reviewdetail reviews;
+                              if(Provider.of<SortedProvider>(context,listen:false).sorted == 0){
+                                reviews = snapshot.data![index];}
+                              else if(Provider.of<SortedProvider>(context,listen:false).sorted == 1){
+                                List<Reviewdetail> sortedList = [...snapshot.data!];
+                                sortedList.sort((b, a) => (a.grade.lessor+a.grade.area+a.grade.noise+a.grade.quality).compareTo((b.grade.lessor+b.grade.area+b.grade.noise+b.grade.quality)));
+                                reviews = sortedList[index];
+                              }else{
+                                List<Reviewdetail> sortedList = [...snapshot.data!];
+                                sortedList.sort((a, b) => (a.grade.lessor+a.grade.area+a.grade.noise+a.grade.quality).compareTo((b.grade.lessor+b.grade.area+b.grade.noise+b.grade.quality)));
+                                reviews = sortedList[index];
+                              }
+                              Body body = reviews.body;
+                              Grade grade = reviews.grade;
+                              List<Map<String, dynamic>> images = reviews.images;
+                              return Container(
+                                child: ListTile(
+                                  title: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.account_circle,
+                                            size: 35,
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "익명",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18),
+                                          ),
+                                          SizedBox(
+                                            width: 6,
+                                          ),
+                                          RatingBarIndicator(
+                                            rating: (grade.lessor +
+                                                grade.area +
+                                                grade.noise +
+                                                grade.quality) /
+                                                4,
+                                            itemBuilder: (context, index) => Icon(
+                                              Icons.star,
+                                              color: Colors.amber,
+                                            ),
+                                            itemCount: 5,
+                                            itemSize: 17.0,
+                                            direction: Axis.horizontal,
+                                          ),
+                                          SizedBox(
+                                            width: 3,
+                                          ),
+                                          Text(
+                                            '${NumberFormat("#.#").format((grade.lessor + grade.area + grade.noise + grade.quality) / 4)}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            '${DateFormat("yy/MM/dd HH:mm").format(reviews.modifiedAt)}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey,
+                                                fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  subtitle: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            for (var image in images)
+                                              Container(
+                                                padding: EdgeInsets.all(1),
+                                                width: 150,
+                                                height: 150,
+                                                child:
+                                                reviews.buildImageWidget(image),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text('장점',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue,
+                                              fontSize: 15)),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text("${body.advantage}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.black,
+                                              fontSize: 15)),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('단점',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                              fontSize: 15)),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('${body.weakness}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.black,
+                                              fontSize: 15)),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('기타',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                              fontSize: 15)),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('${body.etc}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.black,
+                                              fontSize: 15)),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      Divider(
+                                        thickness: 1,
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text("${snapshot.error}에러!!");
+                    }
+                    return CircularProgressIndicator();
+                  },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -997,27 +1227,23 @@ class _mapScreenState extends State<mapScreen>
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       Row(
                         children: [
-                          LikeButton(
-                            isLiked: Provider.of<LikeProvider>(context,
-                                            listen: false)
-                                        .isLiked ==
-                                    true
-                                ? true
-                                : false,
-                            likeBuilder: (bool isLiked) {
-                              return Icon(
-                                Icons.favorite,
-                                color: isLiked ? Colors.red : Colors.grey,
-                                size: 20,
-                              );
-                            },
-                            onTap: (isLiked) => onLikeButtonTapped(
-                                Provider.of<LikeProvider>(context,
-                                        listen: false)
-                                    .isLiked,
-                                roadaddress,
+                          Consumer<LikeProvider>(
+                            builder: (context, likeProvider, _) => LikeButton(
+                              isLiked: likeProvider.isLiked ,
+                              likeBuilder: (bool isLiked) {
+                                return Icon(
+                                  Icons.favorite,
+                                  color: isLiked ? Colors.red : Colors.grey,
+                                  size: 20,
+                                );
+                              },
+                              onTap: (isLiked) => onLikeButtonTapped(
+                                likeProvider.isLiked,
+                                _location,
                                 kakaoLatitude,
-                                kakaoLongitude),
+                                kakaoLongitude,
+                              ),
+                            ),
                           ),
                           SizedBox(width: 20),
                           Text(
@@ -1105,27 +1331,23 @@ class _mapScreenState extends State<mapScreen>
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       Row(
                         children: [
-                          LikeButton(
-                            isLiked: Provider.of<LikeProvider>(context,
-                                            listen: false)
-                                        .isLiked ==
-                                    true
-                                ? true
-                                : false,
-                            likeBuilder: (bool isLiked) {
-                              return Icon(
-                                Icons.favorite,
-                                color: isLiked ? Colors.red : Colors.grey,
-                                size: 20,
-                              );
-                            },
-                            onTap: (isLiked) => onLikeButtonTapped(
-                                Provider.of<LikeProvider>(context,
-                                        listen: false)
-                                    .isLiked,
+                          Consumer<LikeProvider>(
+                            builder: (context, likeProvider, _) => LikeButton(
+                              isLiked: likeProvider.isLiked ,
+                              likeBuilder: (bool isLiked) {
+                                return Icon(
+                                  Icons.favorite,
+                                  color: isLiked ? Colors.red : Colors.grey,
+                                  size: 20,
+                                );
+                              },
+                              onTap: (isLiked) => onLikeButtonTapped(
+                                likeProvider.isLiked,
                                 roadaddress,
                                 kakaoLatitude,
-                                kakaoLongitude),
+                                kakaoLongitude,
+                              ),
+                            ),
                           ),
                           SizedBox(width: 20),
                           Text(
@@ -1205,4 +1427,22 @@ class _mapScreenState extends State<mapScreen>
     }
     return Provider.of<LikeProvider>(context, listen: false).isLiked;
   }
+
+  Future<bool> onLikeButtonTapped(
+      bool isLiked, String location, double lat, double lng) async {
+    if (isLiked) {
+      // 좋아요 취소를 위해 DELETE 요청 보내기
+      favoriteDeleteRequest(
+          Provider.of<UIDProvider>(context, listen: false).uid, location);
+    } else {
+      // 좋아요 추가를 위해 POST 요청 보내기
+      favoritePostRequest(Provider.of<UIDProvider>(context, listen: false).uid,
+          location, lat, lng);
+    }
+
+    // isLiked 값 반전시키기
+    Provider.of<LikeProvider>(context, listen: false).toggleLike();
+    return Provider.of<LikeProvider>(context, listen: false).isLiked;
+  }
+
 }

@@ -75,9 +75,7 @@ class _App extends StatelessWidget {
     }
 
     return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'NotoSans',
-      ),
+
       debugShowCheckedModeBanner: false,
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),

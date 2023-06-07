@@ -66,7 +66,47 @@ class _communityScreenState extends State<communityScreen> {
 
               //통합 검색
               OutlinedButton.icon(
-                onPressed: () {
+                onPressed: Provider.of<UIDProvider>(context, listen: false)
+                    .valid !=
+                    "CERTIFIED"
+                    ? () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text(
+                          '거주지 인증을 먼저 완료해주세요!',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        actions: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                child: TextButton(
+                                  child: Text(
+                                    '확인',
+                                    style: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                    :() {
                   Navigator.of(context)
                       .push(
                     MaterialPageRoute(

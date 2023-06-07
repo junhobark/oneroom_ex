@@ -82,7 +82,9 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
   Future<void> postLike() async {
     var url =
         Uri.parse('http://10.0.2.2:8080/community/GENERAL/${widget.id}/like');
-    var body = {"memberId": "${Provider.of<UIDProvider>(context,listen: false).uid}"};
+    var body = {
+      "memberId": "${Provider.of<UIDProvider>(context, listen: false).uid}"
+    };
 
     var response = await http.post(
       url,
@@ -104,7 +106,9 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
   Future<void> commentLike(int commentId) async {
     var url = Uri.parse(
         'http://10.0.2.2:8080/community/GENERAL/${widget.id}/${commentId}/like');
-    var body = {"memberId": "${Provider.of<UIDProvider>(context,listen: false).uid}"};
+    var body = {
+      "memberId": "${Provider.of<UIDProvider>(context, listen: false).uid}"
+    };
 
     var response = await http.post(
       url,
@@ -127,7 +131,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
     var url = Uri.parse(
         'http://10.0.2.2:8080/community/GENERAL/${widget.id}/writeComment');
     var body = {
-      "memberId": "${Provider.of<UIDProvider>(context,listen: false).uid}",
+      "memberId": "${Provider.of<UIDProvider>(context, listen: false).uid}",
       "postId": "${widget.id}",
       "body": commentController.text,
     };
@@ -377,99 +381,107 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                       ),
                                       //본문 수정
                                       Row(
-                                        children:
-                                       [ if('${Provider.of<UIDProvider>(context,listen: false).uid}'  == postData!['memberId'])
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context)
-                                                  .push(
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (BuildContext context) =>
-                                                          GeneralBoardWriteEdit(
-                                                    id: postData!['id'],
-                                                  ),
-                                                ),
-                                              ) //.then~ //실행 후 게시판을 최신화
-                                                  .then((value) {
-                                                setState(() {
-                                                  fetchData();
-                                                });
-                                              });
-                                            },
-                                            child: Text(
-                                              '수정',
-                                              style: TextStyle(
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w700,
-                                                color: BODY_TEXT_COLOR,
-                                              ),
-                                            ),
-                                          ) ,
-                                         if('${Provider.of<UIDProvider>(context,listen: false).uid}'  == postData!['memberId'])
-                                          //본문 삭제
-                                          TextButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: Text(
-                                                      '이 글을 삭제하시겠습니까?',
-                                                      style: TextStyle(
-                                                          fontSize: 18.0,
-                                                          fontWeight:
-                                                              FontWeight.w700),
+                                        children: [
+                                          if ('${Provider.of<UIDProvider>(context, listen: false).uid}' ==
+                                              postData!['memberId'])
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .push(
+                                                  MaterialPageRoute(
+                                                    builder: (BuildContext
+                                                            context) =>
+                                                        GeneralBoardWriteEdit(
+                                                      id: postData!['id'],
                                                     ),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        child: Text(
-                                                          '네',
-                                                          style: TextStyle(
-                                                            color: Colors.red,
-                                                            fontSize: 16.0,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                          ),
-                                                        ),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop(); // 다이얼로그 닫기
-                                                          Navigator.of(context)
-                                                              .pop(); // 다이얼로그 닫기
-                                                          deletePost();
-                                                        },
-                                                      ),
-                                                      TextButton(
-                                                        child: Text(
-                                                          '아니오',
-                                                          style: TextStyle(
-                                                            color: Colors.red,
-                                                            fontSize: 16.0,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                          ),
-                                                        ),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop(); // 다이얼로그 닫기
-                                                        },
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                            child: Text(
-                                              '삭제',
-                                              style: TextStyle(
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w700,
-                                                color: BODY_TEXT_COLOR,
+                                                  ),
+                                                ) //.then~ //실행 후 게시판을 최신화
+                                                    .then((value) {
+                                                  setState(() {
+                                                    fetchData();
+                                                  });
+                                                });
+                                              },
+                                              child: Text(
+                                                '수정',
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: BODY_TEXT_COLOR,
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                          if ('${Provider.of<UIDProvider>(context, listen: false).uid}' ==
+                                              postData!['memberId'])
+                                            //본문 삭제
+                                            TextButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                        '이 글을 삭제하시겠습니까?',
+                                                        style: TextStyle(
+                                                            fontSize: 18.0,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w700),
+                                                      ),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          child: Text(
+                                                            '네',
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 16.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(); // 다이얼로그 닫기
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(); // 다이얼로그 닫기
+                                                            deletePost();
+                                                          },
+                                                        ),
+                                                        TextButton(
+                                                          child: Text(
+                                                            '아니오',
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 16.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(); // 다이얼로그 닫기
+                                                          },
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              child: Text(
+                                                '삭제',
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: BODY_TEXT_COLOR,
+                                                ),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     ],
@@ -482,6 +494,7 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                               color: Colors.grey[200],
                               thickness: 4.0,
                             ),
+
                             //댓글
                             SingleChildScrollView(
                               child: ListView.builder(
@@ -491,72 +504,112 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                 itemBuilder: (context, index) {
                                   var comment = postData!['comments'][index];
                                   var commentId = comment['id'];
-                                  // ignore: unused_local_variable
                                   var commentCreatedAt = comment['createdAt'];
                                   return ListTile(
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                    title: Column(
                                       children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Image.asset(
-                                                  'asset/img/logo/Info_profile.png',
-                                                  width: 40,
-                                                  height: 40,
-                                                ),
-                                                Text(
-                                                  '익명$commentId',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 16.0),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
                                                 children: [
+                                                  Image.asset(
+                                                    'asset/img/logo/Info_profile.png',
+                                                    width: 40,
+                                                    height: 40,
+                                                  ),
                                                   Text(
-                                                    comment['body'],
+                                                    '익명$commentId',
                                                     style: TextStyle(
                                                       color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 14.0,
+                                                      fontSize: 16.0,
+                                                      fontWeight: FontWeight.w700,
                                                     ),
                                                   ),
-                                                  SizedBox(height: 4),
+                                                ],
+                                              ),
+                                              Container(
+                                                width: 77.0,
+                                                height: 20.0,
+                                                child: OutlinedButton.icon(
+                                                  onPressed: () {
+                                                    if (isliked) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              '이미 공감한 댓글입니다.'),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      commentLike(commentId);
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.thumb_up_alt_outlined,
+                                                    color: liked
+                                                        ? Colors.black
+                                                        : Colors.black,
+                                                    size: 14,
+                                                  ),
+                                                  label: Text(
+                                                    '공감',
+                                                    style: TextStyle(
+                                                      color: liked
+                                                          ? Colors.black
+                                                          : Colors.black,
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        INPUT_BG_COLOR,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        //댓글본문
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                comment['body'],
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 14.0,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+
+                                              //시간, 댓글추천수, 수정, 삭제
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.spaceBetween,
+                                                children: [
                                                   Row(
                                                     children: [
                                                       Text(
-                                                        DateFormat(
-                                                                'MM/dd  HH:mm')
-                                                            .format(
-                                                          DateTime.parse(
-                                                              postData![
-                                                                  'createdAt']),
-                                                        ),
+                                                        DateFormat('MM/dd  HH:mm')
+                                                            .format(DateTime.parse(
+                                                                commentCreatedAt)),
                                                         style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w600,
+                                                          fontWeight: FontWeight.w600,
                                                           fontSize: 14.0,
-                                                          color:
-                                                              BODY_TEXT_COLOR,
+                                                          color: BODY_TEXT_COLOR,
                                                         ),
                                                       ),
-                                                      SizedBox(width: 8),
-                                                      //댓글추천 카운트
+                                                      SizedBox(width: 14),
                                                       Row(
                                                         children: [
                                                           Icon(
@@ -565,192 +618,147 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
                                                             size: 14,
                                                             color: Colors.red,
                                                           ),
-                                                          SizedBox(width: 3),
+                                                          SizedBox(width: 4),
                                                           Text(
                                                             '${comment['likes']}',
                                                             style: TextStyle(
                                                               fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
+                                                                  FontWeight.w600,
                                                               fontSize: 14.0,
                                                               color: Colors.red,
                                                             ),
                                                           ),
-                                                          SizedBox(width: 10),
                                                         ],
                                                       ),
                                                     ],
                                                   ),
-                                                  SizedBox(height: 6),
-                                                  Divider(
-                                                    color: Colors.grey[200],
-                                                    thickness: 1.0,
+                                                  Row(
+                                                    children: [
+                                                      if ('${Provider.of<UIDProvider>(context, listen: false).uid}' ==
+                                                          comment['memberId'])
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            setState(
+                                                              () {
+                                                                String commentText =
+                                                                    comment['body'];
+                                                                commentController
+                                                                        .text =
+                                                                    commentText;
+                                                                commentid = comment !=
+                                                                        null
+                                                                    ? comment['id']
+                                                                        as int?
+                                                                    : null;
+                                                                isEditing = true;
+                                                              },
+                                                            );
+                                                          },
+                                                          child: Text(
+                                                            '수정',
+                                                            style: TextStyle(
+                                                              fontSize: 14.0,
+                                                              fontWeight:
+                                                                  FontWeight.w700,
+                                                              color: BODY_TEXT_COLOR,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      if ('${Provider.of<UIDProvider>(context, listen: false).uid}' ==
+                                                          comment['memberId'])
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (BuildContext
+                                                                  context) {
+                                                                return AlertDialog(
+                                                                  title: Text(
+                                                                    '이 댓글을 삭제하시겠습니까?',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            18.0,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w700),
+                                                                  ),
+                                                                  actions: <Widget>[
+                                                                    TextButton(
+                                                                      child: Text(
+                                                                        '네',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color: Colors
+                                                                              .red,
+                                                                          fontSize:
+                                                                              16.0,
+                                                                          fontWeight:
+                                                                              FontWeight
+                                                                                  .w700,
+                                                                        ),
+                                                                      ),
+                                                                      onPressed: () {
+                                                                        Navigator.of(
+                                                                                context)
+                                                                            .pop();
+                                                                        deleteComment(
+                                                                            commentId);
+                                                                      },
+                                                                    ),
+                                                                    TextButton(
+                                                                      child: Text(
+                                                                        '아니오',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color: Colors
+                                                                              .red,
+                                                                          fontSize:
+                                                                              16.0,
+                                                                          fontWeight:
+                                                                              FontWeight
+                                                                                  .w700,
+                                                                        ),
+                                                                      ),
+                                                                      onPressed: () {
+                                                                        Navigator.of(
+                                                                                context)
+                                                                            .pop(); // 다이얼로그 닫기
+                                                                      },
+                                                                    ),
+                                                                  ],
+                                                                );
+                                                              },
+                                                            );
+                                                          },
+                                                          child: Text(
+                                                            '삭제',
+                                                            style: TextStyle(
+                                                              fontSize: 14.0,
+                                                              fontWeight:
+                                                                  FontWeight.w700,
+                                                              color: BODY_TEXT_COLOR,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                        Column(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                SizedBox(width: 65.0),
-                                                //댓글 추천 버튼
-                                                Container(
-                                                  width: 40.0,
-                                                  height: 40.0,
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color: Colors.black,
-                                                      width: 1,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: IconButton(
-                                                    onPressed: () {
-                                                      if (isliked) {
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                                '이미 공감한 댓글입니다.'),
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        commentLike(commentId);
-                                                      }
-                                                    },
-                                                    icon: Icon(
-                                                      Icons
-                                                          .thumb_up_alt_outlined,
-                                                      color: isliked
-                                                          ? Colors.black
-                                                          : Colors.black,
-                                                      size: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                //댓글 수정
-                                                if('${Provider.of<UIDProvider>(context,listen: false).uid}' == comment['memberId'])
-                                                TextButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      String commentText =
-                                                          comment['body'];
-                                                      commentController.text =
-                                                          commentText;
-                                                      commentid =
-                                                          comment != null
-                                                              ? comment['id']
-                                                                  as int?
-                                                              : null;
-                                                      isEditing = true;
-                                                    });
-                                                  },
-                                                  child: Text(
-                                                    '수정',
-                                                    style: TextStyle(
-                                                      fontSize: 14.0,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: BODY_TEXT_COLOR,
-                                                    ),
-                                                  ),
-                                                ),
-                                                //댓글 삭제 버튼
-                                                if('${Provider.of<UIDProvider>(context,listen: false).uid}' == comment['memberId'])
-                                                TextButton(
-                                                  onPressed: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return AlertDialog(
-                                                          title: Text(
-                                                            '이 댓글을 삭제하시겠습니까?',
-                                                            style: TextStyle(
-                                                                fontSize: 18.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700),
-                                                          ),
-                                                          actions: <Widget>[
-                                                            TextButton(
-                                                              child: Text(
-                                                                '네',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize:
-                                                                      16.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                ),
-                                                              ),
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                                deleteComment(
-                                                                    commentId);
-                                                              },
-                                                            ),
 
-                                                            TextButton(
-                                                              child: Text(
-                                                                '아니오',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize:
-                                                                      16.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                ),
-                                                              ),
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(); // 다이얼로그 닫기
-                                                              },
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                  child: Text(
-                                                    '삭제',
-                                                    style: TextStyle(
-                                                      fontSize: 14.0,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: BODY_TEXT_COLOR,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        )
+                                        Divider(
+                                          color: Colors.grey[200],
+                                          thickness: 2.0,
+                                        ),
                                       ],
                                     ),
                                   );
                                 },
                               ),
                             ),
+
                           ],
                         ),
                       )
