@@ -29,10 +29,10 @@ class Reviewmodify2 extends StatefulWidget {
 class _Reviewmodify2State extends State<Reviewmodify2> {
   Reviewdetail? modify;
   bool _isLoading = true;
-  TextEditingController advantageController = TextEditingController();
-  TextEditingController weaknessController = TextEditingController();
-  TextEditingController etcController = TextEditingController();
-
+  final advantageController = TextEditingController();
+  final weaknessController = TextEditingController();
+  final etcController = TextEditingController();
+  final int minTextLength = 10;
   Future<String> modifyPostRequest() async {
     final dio = Dio();
     var url =
@@ -406,14 +406,12 @@ class _Reviewmodify2State extends State<Reviewmodify2> {
                       height: 20,
                     ),
                     ElevatedButton(
-                      onPressed: Provider.of<REVIEW2Provider>(context)
-                                      .advantage ==
-                                  '' ||
-                              Provider.of<REVIEW2Provider>(context).weakness ==
-                                  '' ||
-                              Provider.of<REVIEW2Provider>(context).etc == ''
+                      onPressed: Provider.of<REVIEW2Provider>(context).advantage == '' ||
+                          Provider.of<REVIEW2Provider>(context).weakness == '' ||
+                          advantageController.text.length < minTextLength ||
+                          weaknessController.text.length < minTextLength
                           ? null
-                          : () async {
+                          :  () async {
                               if (pickedFiles.length > maxImageCount) {
                                 showDialog(
                                     context: context,
@@ -488,12 +486,20 @@ class _Reviewmodify2State extends State<Reviewmodify2> {
   }
 
   void _checkTextLength1(String text) {
+    if (text.trim().isEmpty) { // 입력된 텍스트가 스페이스로만 구성되어 있는지 확인
+      // 스페이스로만 구성되어 있다면 처리를 무시하고 리턴
+      return;
+    }
     setState(() {
       Provider.of<REVIEW2Provider>(context, listen: false).advantage = text;
     });
   }
 
   void _checkTextLength2(String text) {
+    if (text.trim().isEmpty) { // 입력된 텍스트가 스페이스로만 구성되어 있는지 확인
+      // 스페이스로만 구성되어 있다면 처리를 무시하고 리턴
+      return;
+    }
     setState(() {
       Provider.of<REVIEW2Provider>(context, listen: false).weakness = text;
     });

@@ -1156,12 +1156,14 @@ class _mapScreenState extends State<mapScreen>
                                       SizedBox(
                                         height: 5,
                                       ),
+                                      body.etc =='' ?Text(''):
                                       Text('기타',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.green,
                                               fontSize: 15)),
-                                      SizedBox(
+                                      body.etc =='' ?
+                                      SizedBox():SizedBox(
                                         height: 5,
                                       ),
                                       Text('${body.etc}',
@@ -1169,6 +1171,7 @@ class _mapScreenState extends State<mapScreen>
                                               fontWeight: FontWeight.normal,
                                               color: Colors.black,
                                               fontSize: 15)),
+
                                       SizedBox(
                                         height: 15,
                                       ),

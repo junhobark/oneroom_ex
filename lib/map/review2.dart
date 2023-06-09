@@ -39,6 +39,7 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
   final addmyController = TextEditingController();
   final weaController = TextEditingController();
   final etcController = TextEditingController();
+  final int minTextLength = 10;
   String advantage = '';
   String weakness = '';
   String etc = '';
@@ -332,14 +333,12 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
                       height: 15,
                     ),
                     ElevatedButton(
-                      onPressed: Provider.of<REVIEW2Provider>(context)
-                                      .advantage ==
-                                  '' ||
-                              Provider.of<REVIEW2Provider>(context).weakness ==
-                                  '' ||
-                              Provider.of<REVIEW2Provider>(context).etc == ''
+                      onPressed:Provider.of<REVIEW2Provider>(context).advantage == '' ||
+                          Provider.of<REVIEW2Provider>(context).weakness == '' ||
+                          addmyController.text.length < minTextLength ||
+                          weaController.text.length < minTextLength
                           ? null
-                          : () async {
+                          :  () async {
                               if (pickedFiles.length > maxImageCount) {
                                 showDialog(
                                     context: context,
@@ -424,12 +423,20 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
   }
 
   void _checkTextLength1(String text) {
+    if (text.trim().isEmpty) { // 입력된 텍스트가 스페이스로만 구성되어 있는지 확인
+      // 스페이스로만 구성되어 있다면 처리를 무시하고 리턴
+      return;
+    }
     setState(() {
       Provider.of<REVIEW2Provider>(context, listen: false).advantage = text;
     });
   }
 
   void _checkTextLength2(String text) {
+    if (text.trim().isEmpty) { // 입력된 텍스트가 스페이스로만 구성되어 있는지 확인
+      // 스페이스로만 구성되어 있다면 처리를 무시하고 리턴
+      return;
+    }
     setState(() {
       Provider.of<REVIEW2Provider>(context, listen: false).weakness = text;
     });
@@ -440,6 +447,8 @@ class _ReviewScreen2State extends State<ReviewScreen2> {
       Provider.of<REVIEW2Provider>(context, listen: false).etc = text;
     });
   }
+
+
 
   int maxImageCount = 5; // Maximum number of images allowed
 
