@@ -25,6 +25,7 @@ class _SampleScreenState extends State<SampleScreen> {
   String userNickname = '';
   String location = '';
 
+
   Future<void> sendPostRequest(uuid, location, username, usernickname) async {
     var url = Uri.parse('http://10.0.2.2:8080/user/sign');
     Map data = {
@@ -77,6 +78,8 @@ class _SampleScreenState extends State<SampleScreen> {
               userName = result.account.name;
               userEmail = result.account.email;
               userNickname = result.account.nickname;
+              NaverAccessToken accesstoken = result.accessToken;
+              Provider.of<UIDProvider>(context, listen: false).navertoken(accesstoken);
               try {
                 final newUser1 =
                     await _authentication.signInWithEmailAndPassword(

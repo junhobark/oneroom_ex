@@ -27,18 +27,21 @@ class _informationScreen extends State<informationScreen> {
   String data = 'false';
   void initState() {
     super.initState();
-    getCurrentUser();
     adminauthority(Provider.of<UIDProvider>(context,listen:false).uid);
   }
 
-  void getCurrentUser() {
-    try {
-      final user = _authentication.currentUser;
-      if (user != null) {
-        loggedUser = user;
-      }
-    } catch (e) {
-      print(e);
+  void logoutFromNaver() async {
+    // 네이버 로그아웃 API 호출
+    final response = await http.get(Uri.parse('https://nid.naver.com/oauth2.0/token?grant_type=logout&access_token=${Provider.of<UIDProvider>(context, listen: false).access_token}'));
+
+    if (response.statusCode == 200) {
+      _signOut();
+      // 로그아웃 성공
+      print('Naver logout success');
+
+    } else {
+      // 로그아웃 실패
+      print('Naver logout failed');
     }
   }
 
@@ -90,12 +93,15 @@ class _informationScreen extends State<informationScreen> {
                                           color: Colors
                                               .black),
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async{
+                                      await _authentication.signOut();
+                                      logoutFromNaver();
                                       _signOut();
-                                      _authentication.signOut();
                                       Navigator.pop(context);
                                       Navigator.pop(
                                           context);
+
+
 
                                     })),
                             Container(
@@ -532,7 +538,7 @@ class _informationScreen extends State<informationScreen> {
                       child:
 
 
-        data == 'true'? Text(
+        data =='true'? Text(
                         'go amin',
                         textAlign: TextAlign.center,
                         style: TextStyle(

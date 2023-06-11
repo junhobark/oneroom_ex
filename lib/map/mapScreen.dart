@@ -906,297 +906,363 @@ class _mapScreenState extends State<mapScreen>
       ),
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.75, // 원하는 높이로 조절합니다.
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return StatefulBuilder(
+          builder:  (BuildContext context, StateSetter setState) {
+            return Container(
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.75, // 원하는 높이로 조절합니다.
+              child: Container(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("${location.replaceFirst('경남 진주시 ', '')}",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Consumer<LikeProvider>(
-                          builder: (context, likeProvider, _) => LikeButton(
-                            isLiked: likeProvider.isLiked,
-                            likeBuilder: (bool isLiked) {
-                              return Icon(
-                                Icons.favorite,
-                                color: isLiked ? Colors.red : Colors.grey,
-                                size: 20,
-                              );
-                            },
-                            onTap: (isLiked) => onLikeButtonTapped(
-                              likeProvider.isLiked,
-                              location,
-                              lat,
-                              lng,
+                        Text("${location.replaceFirst('경남 진주시 ', '')}",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        Row(
+                          children: [
+                            Consumer<LikeProvider>(
+                              builder: (context, likeProvider, _) =>
+                                  LikeButton(
+                                    isLiked: likeProvider.isLiked,
+                                    likeBuilder: (bool isLiked) {
+                                      return Icon(
+                                        Icons.favorite,
+                                        color: isLiked ? Colors.red : Colors
+                                            .grey,
+                                        size: 20,
+                                      );
+                                    },
+                                    onTap: (isLiked) =>
+                                        onLikeButtonTapped(
+                                          likeProvider.isLiked,
+                                          location,
+                                          lat,
+                                          lng,
+                                        ),
+                                  ),
                             ),
-                          ),
+                            SizedBox(width: 20),
+                            Text(
+                              '${NumberFormat("#.#").format(totalgrade / 4)}',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              '(리뷰 ${reviewcount})',
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
                         ),
-                        SizedBox(width: 20),
-                        Text(
-                          '${NumberFormat("#.#").format(totalgrade/ 4)}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          '(리뷰 ${reviewcount})',
-                          style: TextStyle(fontSize: 12),
-                        )
                       ],
                     ),
-                  ],
-                ),
-                SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("${location}", style: TextStyle(fontSize: 12)),
-                    RatingBarIndicator(
-                      rating: totalgrade/ 4,
-                      itemBuilder: (context, index) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      itemCount: 5,
-                      itemSize: 17.0,
-                      direction: Axis.horizontal,
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("${location}", style: TextStyle(fontSize: 12)),
+                        RatingBarIndicator(
+                          rating: totalgrade / 4,
+                          itemBuilder: (context, index) =>
+                              Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                          itemCount: 5,
+                          itemSize: 17.0,
+                          direction: Axis.horizontal,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Divider(
+                      color: Colors.grey,
+                      thickness: 2,
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("리뷰",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        Row(children: [
+                          if(Provider
+                              .of<SortedProvider>(context, listen: false)
+                              .sorted == 0)
+                            Text("최신순",
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold)),
+                          if(Provider
+                              .of<SortedProvider>(context, listen: false)
+                              .sorted == 1)
+                            Text("평점순↑",
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold)),
+                          if(Provider
+                              .of<SortedProvider>(context, listen: false)
+                              .sorted == 2)
+                            Text("평점순↓",
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold)),
+                          IconButton(
+                            icon: Icon(Icons.sort),
+                            tooltip: '정렬하기',
+                            onPressed: () {
+                              setState(() {
+                                if (Provider
+                                    .of<SortedProvider>(context, listen: false)
+                                    .sorted == 0) {
+                                  Provider.of<SortedProvider>(
+                                      context, listen: false).sort1();
+                                } else if (Provider
+                                    .of<SortedProvider>(context, listen: false)
+                                    .sorted == 1) {
+                                  Provider.of<SortedProvider>(
+                                      context, listen: false).sort2();
+                                } else {
+                                  Provider.of<SortedProvider>(
+                                      context, listen: false).sort0();
+                                }
+                              });
+                            },
+                          )
+                        ])
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    FutureBuilder<List<Reviewdetail>>(
+                      future: reviewfetchData(location),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Expanded(
+                            child: ListView.builder(
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  Reviewdetail reviews;
+                                  if (Provider
+                                      .of<SortedProvider>(
+                                      context, listen: false)
+                                      .sorted == 0) {
+                                    reviews = snapshot.data![index];
+                                  }
+                                  else if (Provider
+                                      .of<SortedProvider>(
+                                      context, listen: false)
+                                      .sorted == 1) {
+                                    List<Reviewdetail> sortedList = [
+                                      ...snapshot.data!
+                                    ];
+                                    sortedList.sort((b, a) =>
+                                        (a.grade.lessor + a.grade.area +
+                                            a.grade.noise + a.grade.quality)
+                                            .compareTo(
+                                            (b.grade.lessor + b.grade.area +
+                                                b.grade.noise +
+                                                b.grade.quality)));
+                                    reviews = sortedList[index];
+                                  } else {
+                                    List<Reviewdetail> sortedList = [
+                                      ...snapshot.data!
+                                    ];
+                                    sortedList.sort((a, b) =>
+                                        (a.grade.lessor + a.grade.area +
+                                            a.grade.noise + a.grade.quality)
+                                            .compareTo(
+                                            (b.grade.lessor + b.grade.area +
+                                                b.grade.noise +
+                                                b.grade.quality)));
+                                    reviews = sortedList[index];
+                                  }
+                                  Body body = reviews.body;
+                                  Grade grade = reviews.grade;
+                                  List<Map<String, dynamic>> images = reviews
+                                      .images;
+                                  return Container(
+                                    child: ListTile(
+                                      title: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.account_circle,
+                                                size: 35,
+                                              ),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                "익명",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                              SizedBox(
+                                                width: 6,
+                                              ),
+                                              RatingBarIndicator(
+                                                rating: (grade.lessor +
+                                                    grade.area +
+                                                    grade.noise +
+                                                    grade.quality) /
+                                                    4,
+                                                itemBuilder: (context, index) =>
+                                                    Icon(
+                                                      Icons.star,
+                                                      color: Colors.amber,
+                                                    ),
+                                                itemCount: 5,
+                                                itemSize: 17.0,
+                                                direction: Axis.horizontal,
+                                              ),
+                                              SizedBox(
+                                                width: 3,
+                                              ),
+                                              Text(
+                                                '${NumberFormat("#.#").format(
+                                                    (grade.lessor + grade.area +
+                                                        grade.noise +
+                                                        grade.quality) / 4)}',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .end,
+                                            children: [
+                                              Text(
+                                                '${DateFormat("yy/MM/dd HH:mm")
+                                                    .format(
+                                                    reviews.modifiedAt)}',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight
+                                                        .normal,
+                                                    color: Colors.grey,
+                                                    fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      subtitle: Column(
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .start,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .start,
+                                        children: [
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .start,
+                                              children: [
+                                                for (var image in images)
+                                                  Container(
+                                                    padding: EdgeInsets.all(1),
+                                                    width: 150,
+                                                    height: 150,
+                                                    child:
+                                                    reviews.buildImageWidget(
+                                                        image),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text('장점',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                  fontSize: 15)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text("${body.advantage}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                  fontSize: 15)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('단점',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red,
+                                                  fontSize: 15)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('${body.weakness}',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                  fontSize: 15)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('기타',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green,
+                                                  fontSize: 15)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('${body.etc}',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                  fontSize: 15)),
+
+                                          SizedBox(
+                                            height: 15,
+                                          ),
+                                          Divider(
+                                            thickness: 1,
+                                          ),
+                                          SizedBox(
+                                            height: 15,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text("${snapshot.error}에러!!");
+                        }
+                        return CircularProgressIndicator();
+                      },
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
-                Divider(
-                  color: Colors.grey,
-                  thickness: 2,
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("리뷰",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Row(children:[
-                      if(Provider.of<SortedProvider>(context,listen:false).sorted == 0)
-                        Text("최신순",
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                      if(Provider.of<SortedProvider>(context,listen:false).sorted == 1)
-                        Text("평점순↑",
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                      if(Provider.of<SortedProvider>(context,listen:false).sorted == 2)
-                        Text("평점순↓",
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                      IconButton(
-                        icon: Icon(Icons.sort),
-                        tooltip: '정렬하기',
-                        onPressed: () {
-                          setState(() {
-                            if (Provider.of<SortedProvider>(context,listen:false).sorted == 0) {
-                              Provider.of<SortedProvider>(context,listen:false).sort1();
-                            } else if(Provider.of<SortedProvider>(context,listen:false).sorted == 1){
-                              Provider.of<SortedProvider>(context,listen:false).sort2();
-                            }else{
-                              Provider.of<SortedProvider>(context,listen:false).sort0();
-                            }
-                          });
-                        },
-                      )])
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                FutureBuilder<List<Reviewdetail>>(
-                  future: reviewfetchData(location),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Expanded(
-                        child: ListView.builder(
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              Reviewdetail reviews;
-                              if(Provider.of<SortedProvider>(context,listen:false).sorted == 0){
-                                reviews = snapshot.data![index];}
-                              else if(Provider.of<SortedProvider>(context,listen:false).sorted == 1){
-                                List<Reviewdetail> sortedList = [...snapshot.data!];
-                                sortedList.sort((b, a) => (a.grade.lessor+a.grade.area+a.grade.noise+a.grade.quality).compareTo((b.grade.lessor+b.grade.area+b.grade.noise+b.grade.quality)));
-                                reviews = sortedList[index];
-                              }else{
-                                List<Reviewdetail> sortedList = [...snapshot.data!];
-                                sortedList.sort((a, b) => (a.grade.lessor+a.grade.area+a.grade.noise+a.grade.quality).compareTo((b.grade.lessor+b.grade.area+b.grade.noise+b.grade.quality)));
-                                reviews = sortedList[index];
-                              }
-                              Body body = reviews.body;
-                              Grade grade = reviews.grade;
-                              List<Map<String, dynamic>> images = reviews.images;
-                              return Container(
-                                child: ListTile(
-                                  title: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.account_circle,
-                                            size: 35,
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
-                                            "익명",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18),
-                                          ),
-                                          SizedBox(
-                                            width: 6,
-                                          ),
-                                          RatingBarIndicator(
-                                            rating: (grade.lessor +
-                                                grade.area +
-                                                grade.noise +
-                                                grade.quality) /
-                                                4,
-                                            itemBuilder: (context, index) => Icon(
-                                              Icons.star,
-                                              color: Colors.amber,
-                                            ),
-                                            itemCount: 5,
-                                            itemSize: 17.0,
-                                            direction: Axis.horizontal,
-                                          ),
-                                          SizedBox(
-                                            width: 3,
-                                          ),
-                                          Text(
-                                            '${NumberFormat("#.#").format((grade.lessor + grade.area + grade.noise + grade.quality) / 4)}',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            '${DateFormat("yy/MM/dd HH:mm").format(reviews.modifiedAt)}',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.grey,
-                                                fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  subtitle: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            for (var image in images)
-                                              Container(
-                                                padding: EdgeInsets.all(1),
-                                                width: 150,
-                                                height: 150,
-                                                child:
-                                                reviews.buildImageWidget(image),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text('장점',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue,
-                                              fontSize: 15)),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text("${body.advantage}",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black,
-                                              fontSize: 15)),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('단점',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.red,
-                                              fontSize: 15)),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('${body.weakness}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black,
-                                              fontSize: 15)),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      body.etc =='' ?Text(''):
-                                      Text('기타',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.green,
-                                              fontSize: 15)),
-                                      body.etc =='' ?
-                                      SizedBox():SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('${body.etc}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black,
-                                              fontSize: 15)),
-
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      Divider(
-                                        thickness: 1,
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text("${snapshot.error}에러!!");
-                    }
-                    return CircularProgressIndicator();
-                  },
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          }
         );
+
       },
     );
   }

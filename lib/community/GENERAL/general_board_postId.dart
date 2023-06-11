@@ -8,6 +8,8 @@ import 'package:oneroom_ex/community/GENERAL/general_board_write_edit.dart';
 import 'package:oneroom_ex/login/uid_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../Info/info_written_board.dart';
+
 class GeneralBoardPostId extends StatefulWidget {
   final int id;
 
@@ -54,11 +56,11 @@ class _GeneralBoardPostIdState extends State<GeneralBoardPostId> {
 
     if (response.statusCode == 200) {
       // 게시물이 성공적으로 삭제되었을 때의 처리
-      Navigator.pushReplacement(
-        //pop으로 뒤로못가게push
+       Navigator.pushReplacement(
+      //   //pop으로 뒤로못가게push
         context,
-        MaterialPageRoute(builder: (context) => GeneralBoardScreen()),
-      );
+         MaterialPageRoute(builder: (context) => WrittenBoardScreen()),
+       );
     } else {
       print('Failed to delete post: ${response.statusCode}');
     }
