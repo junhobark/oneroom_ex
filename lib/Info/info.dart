@@ -538,7 +538,7 @@ class _informationScreen extends State<informationScreen> {
                       child:
 
 
-        data =='true'? Text(
+        data =='false'? Text(
                         'go amin',
                         textAlign: TextAlign.center,
                         style: TextStyle(

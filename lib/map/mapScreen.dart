@@ -232,8 +232,9 @@ class _mapScreenState extends State<mapScreen>
                     markers.add(Marker(
                         markerId: data.id.toString(),
                         latLng: LatLng(data.posx, data.posy),
-                        markerImageSrc:
-                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
+                        // markerImageSrc:
+                        // 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'
+                    ));
                   }).toList();
                   int en = 0;
                   print("관심건물 위치:${_location}");
@@ -283,8 +284,9 @@ class _mapScreenState extends State<mapScreen>
                         markers.add(Marker(
                             markerId: data.id.toString(),
                             latLng: LatLng(data.posx, data.posy),
-                            markerImageSrc:
-                                'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'));
+                            // markerImageSrc:
+                            //     'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png'
+                             ));
                       }).toList();
                     });
                     break;
